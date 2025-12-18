@@ -23,6 +23,7 @@ public class VehicleDto {
     private BigDecimal maxWeight;
     private BigDecimal maxVolume;
 
+    //todo в мапперы
     public static VehicleDto from(Vehicle vehicle) {
         return VehicleDto.builder()
                 .id(vehicle.getId())
@@ -33,6 +34,7 @@ public class VehicleDto {
                 .build();
     }
 
+    //todo неиспользуемый код
     @Data
     @Builder
     @AllArgsConstructor
@@ -55,6 +57,7 @@ public class VehicleDto {
         private BigDecimal maxVolume;
     }
 
+    //todo неиспользуемый код
     @Data
     @Builder
     @AllArgsConstructor

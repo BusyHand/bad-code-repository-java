@@ -52,11 +52,14 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    //todo не защищенный endpoint (@PreAuthorize("hasRole('ADMIN")"))
+    //todo логика в контроллере -> тянем в контроллер
     @GetMapping("/debug")
     @SecurityRequirement(name = "")
     public ResponseEntity<Map<String, String>> debug() {
-        Optional<User> adminUserOptional = userRepository.findByLogin("admin");
-        String newHash = passwordEncoder.encode("admin123");
+        Optional<User> adminUserOptional = userRepository.findByLogin("admin");//todo магическая константа, хардкод, sensitive данные
+        String newHash = passwordEncoder.encode("admin123");//todo магическая константа, хардкод, sensitive данные
+        //todo сделать дто вместо ответа маппой
         Map<String, String> result = new HashMap<>();
         
         if (adminUserOptional.isPresent()) {
@@ -69,6 +72,7 @@ public class AuthController {
             userRepository.save(adminUser);
             result.put("updated", "true");
         } else {
+            //todo выкидывать исключение так как при error статус ответа 200
             result.put("error", "Admin user not found");
         }
         

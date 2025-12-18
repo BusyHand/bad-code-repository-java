@@ -36,6 +36,7 @@ public class DeliveryDto {
     @Builder.Default
     private Boolean canEdit = false;
 
+    //todo должен с этим работать маппер
     public static DeliveryDto from(Delivery delivery) {
         // Calculate total weight and volume
         BigDecimal totalWeight = delivery.getDeliveryPoints().stream()
@@ -72,6 +73,7 @@ public class DeliveryDto {
                 .build();
     }
 
+    //todo использовать в контроллере
     @Data
     @Builder
     @AllArgsConstructor

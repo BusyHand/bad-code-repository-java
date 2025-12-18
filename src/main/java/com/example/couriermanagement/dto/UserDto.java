@@ -20,6 +20,7 @@ public class UserDto {
     private UserRole role;
     private LocalDateTime createdAt;
 
+    //todo в мапперы
     public static UserDto from(User user) {
         return UserDto.builder()
             .id(user.getId())

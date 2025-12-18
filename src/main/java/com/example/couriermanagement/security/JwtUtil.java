@@ -26,6 +26,7 @@ public class JwtUtil {
         if (secret.length() >= 32) {
             keyBytes = secret.getBytes();
         } else {
+            //todo при каждом обращение будет добавлять не оптимизированно строки
             String paddedSecret = secret;
             while (paddedSecret.length() < 32) {
                 paddedSecret += "0";

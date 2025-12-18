@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ public class DeliveryController {
     }
 
     @PostMapping("/generate")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")  //todo а админу?
     @Operation(
         summary = "Автоматически сгенерировать доставки на несколько дней",
         description = """
@@ -58,7 +59,7 @@ public class DeliveryController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')") //todo а админу?
     @Operation(
         summary = "Получить список доставок",
         description = "Получение списка доставок с фильтрацией. Доступно только для менеджера"
@@ -69,6 +70,7 @@ public class DeliveryController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен")
         }
     )
+    //todo в объект
     public ResponseEntity<List<DeliveryDto>> getAllDeliveries(
         @Parameter(description = "Фильтр по дате", example = "2025-01-30")
         @RequestParam(required = false)
@@ -88,7 +90,7 @@ public class DeliveryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')") //todo а админу?
     @Operation(
         summary = "Создать доставку вручную",
         description = "Доступно только для менеджера. Проверяется время маршрута и вместимость машины"
@@ -118,6 +120,7 @@ public class DeliveryController {
             @ApiResponse(responseCode = "404", description = "Доставка не найдена")
         }
     )
+    //todo любой пользователь может получить информацию о доставки другого пользователя
     public ResponseEntity<DeliveryDto> getDeliveryById(
         @Parameter(description = "ID доставки", example = "1")
         @PathVariable Long id
@@ -127,7 +130,7 @@ public class DeliveryController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")  //todo а админу?
     @Operation(
         summary = "Обновить доставку",
         description = "Доступно только для менеджера. Нельзя редактировать за 3 дня до доставки"
@@ -150,7 +153,7 @@ public class DeliveryController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")  //todo а админу?
     @Operation(
         summary = "Удалить доставку",
         description = "Доступно только для менеджера. Нельзя удалять за 3 дня до доставки"

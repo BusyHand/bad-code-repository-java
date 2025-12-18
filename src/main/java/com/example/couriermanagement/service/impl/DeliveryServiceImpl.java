@@ -66,7 +66,8 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Override
     public List<DeliveryDto> getAllDeliveries(LocalDate date, Long courierId, DeliveryStatus status) {
         List<Delivery> deliveries;
-        
+
+        //todo есть объект фильтр
         if (date != null && courierId != null && status != null) {
             deliveries = deliveryRepository.findByDeliveryDateAndCourierIdAndStatus(date, courierId, status);
         } else if (date != null && courierId != null) {
@@ -184,7 +185,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
         long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-        if (daysBetween < 3) {
+        if (daysBetween < 3) { //todo magconst
             throw new IllegalArgumentException("Нельзя редактировать доставку менее чем за 3 дня до даты доставки");
         }
         
@@ -196,7 +197,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         Vehicle vehicle = vehicleRepository.findById(deliveryRequest.getVehicleId())
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
         
-        if (courier.getRole().ordinal() != 2) {
+        if (courier.getRole().ordinal() != 2) { //todo magconst
             throw new IllegalArgumentException("Пользователь не является курьером");
         }
         
@@ -229,7 +230,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
         long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-        if (daysBetween < 3) {
+        if (daysBetween < 3) { //todo magconst
             throw new IllegalArgumentException("Нельзя удалить доставку менее чем за 3 дня до даты доставки");
         }
         
@@ -413,9 +414,9 @@ public class DeliveryServiceImpl implements DeliveryService {
         BigDecimal speedKmPerHour = BigDecimal.valueOf(60);
         BigDecimal requiredHours = distanceKm.divide(speedKmPerHour, 4, RoundingMode.HALF_UP);
 
-        int breakMinutesPerPoint = 30;
+        int breakMinutesPerPoint = 30; //todo magconst
         int totalBreakMinutes = deliveryRequest.getPoints().size() * breakMinutesPerPoint;
-        long totalRequiredMinutes = (long)(requiredHours.doubleValue() * 60) + totalBreakMinutes;
+        long totalRequiredMinutes = (long)(requiredHours.doubleValue() * 60) + totalBreakMinutes; //todo magconst
 
         LocalTime timeStart = deliveryRequest.getTimeStart();
         LocalTime timeEnd = deliveryRequest.getTimeEnd();

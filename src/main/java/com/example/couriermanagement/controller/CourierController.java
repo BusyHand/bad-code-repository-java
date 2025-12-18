@@ -42,6 +42,7 @@ public class CourierController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен")
         }
     )
+    //todo через объект
     public ResponseEntity<List<CourierDeliveryResponse>> getCourierDeliveries(
         @Parameter(description = "Фильтр по дате доставки", example = "2025-01-30")
         @RequestParam(required = false)

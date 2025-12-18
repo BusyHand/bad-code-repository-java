@@ -28,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
+    //todo длинный метод
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -35,24 +36,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization"); //todo магическая константа
         
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) { //todo магическая константа
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String token = authHeader.substring(7);
+            String token = authHeader.substring(7); //todo магическая константа
             String username = jwtUtil.extractUsername(token);
             
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 Optional<User> userOptional = userRepository.findByLogin(username);
                 
                 if (userOptional.isPresent() && jwtUtil.validateToken(token, username)) {
-                    User user = userOptional.get();
+                    User user = userOptional.get(); //todo не правльное обращение к optional
                     List<SimpleGrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
+                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name()) //todo магическая константа
                     );
                     
                     UsernamePasswordAuthenticationToken authentication = 
@@ -66,6 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
+            //todo зачем тут коментарий
+
             // Log the exception if needed
         }
 
