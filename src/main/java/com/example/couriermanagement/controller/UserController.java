@@ -43,7 +43,6 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен")
         }
     )
-    //todo в объект
     public ResponseEntity<List<UserDto>> getAllUsers(
         @Parameter(description = "Фильтр по роли пользователя")
         @RequestParam(required = false) UserRole role

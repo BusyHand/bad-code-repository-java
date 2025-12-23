@@ -28,7 +28,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
-    //todo длинный метод
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

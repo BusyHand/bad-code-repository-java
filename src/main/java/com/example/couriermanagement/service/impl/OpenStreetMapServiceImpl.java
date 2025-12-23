@@ -48,6 +48,7 @@ public class OpenStreetMapServiceImpl implements OpenStreetMapService {
     
     private BigDecimal extractDistanceFromResponse(JsonNode jsonNode) {
         JsonNode features = jsonNode.get("features");
+
         if (features != null && features.isArray() && features.size() > 0) {
             JsonNode properties = features.get(0).get("properties");
             if (properties != null) {

@@ -9,6 +9,7 @@ import com.example.couriermanagement.entity.DeliveryStatus;
 import java.time.LocalDate;
 import java.util.List;
 
+//Теоретическая общность
 public interface DeliveryService {
     List<DeliveryDto> getAllDeliveries(LocalDate date, Long courierId, DeliveryStatus status);
     DeliveryDto getDeliveryById(Long id);

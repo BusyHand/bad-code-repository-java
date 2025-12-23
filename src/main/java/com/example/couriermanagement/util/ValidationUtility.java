@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-
+//todo Ленивый класс
 @Component
 public class ValidationUtility {
     //todo Неприличная демонстрация

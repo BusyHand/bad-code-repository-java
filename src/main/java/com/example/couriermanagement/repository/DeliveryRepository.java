@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Repository
+//todo Большой класс
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     
     List<Delivery> findByDeliveryDate(LocalDate deliveryDate);

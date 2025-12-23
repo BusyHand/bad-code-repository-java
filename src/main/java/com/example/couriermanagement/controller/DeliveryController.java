@@ -70,7 +70,7 @@ public class DeliveryController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен")
         }
     )
-    //todo в объект
+    //todo Группы данных
     public ResponseEntity<List<DeliveryDto>> getAllDeliveries(
         @Parameter(description = "Фильтр по дате", example = "2025-01-30")
         @RequestParam(required = false)
