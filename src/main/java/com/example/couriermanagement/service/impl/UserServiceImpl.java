@@ -179,6 +179,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         //todo Условная сложность
+        //todo повтор
         if (userUpdateRequest.getLogin() != null && userUpdateRequest.getLogin().isEmpty()) {
             throw new IllegalArgumentException("Логин не может быть пустым");
         }
@@ -194,6 +195,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Неправильная роль");
         }
         //todo Условная сложность
+        //todo повтор
         User.UserBuilder builder = user.toBuilder()
                 .login(userUpdateRequest.getLogin() != null ? userUpdateRequest.getLogin() : user.getLogin())
                 .name(userUpdateRequest.getName() != null ? userUpdateRequest.getName() : user.getName())

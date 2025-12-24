@@ -5,7 +5,7 @@ import com.example.couriermanagement.dto.request.ProductRequest;
 
 import java.util.List;
 
-//Теоретическая общность
+//todo Теоретическая общность
 public interface ProductService {
     List<ProductDto> getAllProducts();
     ProductDto createProduct(ProductRequest productRequest);

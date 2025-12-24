@@ -28,7 +28,6 @@ public class CourierServiceImpl implements CourierService {
     private final DeliveryRepository deliveryRepository;
     private final AuthService authService;
 
-    //todo lombok
     public CourierServiceImpl(DeliveryRepository deliveryRepository, AuthService authService) {
         this.deliveryRepository = deliveryRepository;
         this.authService = authService;

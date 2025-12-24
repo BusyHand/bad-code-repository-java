@@ -1,95 +1,148 @@
-**DeliveryServiceImpl**
+## **Описание недостатка**
+В коде жестко закодированы зависимости от конкретных значений enum `UserRole` через использование `ordinal()`. При добавлении новой роли необходимо изменять код в множестве мест, что является нарушением принципа открытости/закрытости (Open/Closed Principle).
+
+## **Проблема с `UserRole` enum**
+```java
+public enum UserRole {
+    ADMIN,        // ordinal = 0
+    MANAGER,      // ordinal = 1
+    COURIER       // ordinal = 2
+    // Проблема: добавление новой роли изменит ordinal существующих ролей!
+}
+```
+
+## **Конкретные примеры проблемного кода**
+
+### **1. Проверка на конкретную роль через ordinal**
 
 ```java
-public DeliveryDto updateDelivery(Long id, DeliveryRequest deliveryRequest) {
-    ...
-    if (daysBetween < 3) { 
-        throw new IllegalArgumentException("Нельзя редактировать доставку менее чем за 3 дня до даты доставки");
+@Service
+@Transactional
+public class DeliveryServiceImpl implements DeliveryService {
+    
+    @Override
+    public DeliveryDto createDelivery(DeliveryRequest deliveryRequest) {
+       ...
+        if (courier.getRole().ordinal() != 2) { // предполагается, что COURIER = 2
+            throw new IllegalArgumentException("Пользователь не является курьером");
+        }
+        ...
+    }
+    
+    @Override
+    public DeliveryDto updateDelivery(Long id, DeliveryRequest deliveryRequest) {
+        ...
+        if (courier.getRole().ordinal() != 2) {
+            throw new IllegalArgumentException("Пользователь не является курьером");
+        }
+        ...
+    }
+    
+    private void addComplexWarnings(...) {
+        ...
+        if (user.getRole().ordinal() == 0) { // предполагается, что ADMIN = 0
+            warnings.add("Администратор не может создать доставки в праздники");
+        }
+        ...
+    }
+    
+    private boolean validateGenerationConditions(...) {
+        ...
+        if (courier.getRole().ordinal() != 1) { // предполагается, что MANAGER = 1
+            warnings.add("Пользователь не курьер");
+            return false;
+        }
+        ...
     }
     ...
-    if (courier.getRole().ordinal() != 2) { 
-        throw new IllegalArgumentException("Пользователь не является курьером");
+}
+```
+
+**Проблемы:**
+- Магические числа 0, 1, 2 без контекста
+- Дублирование проверок по всему коду
+- Ошибка в логике: `ordinal() != 1` проверяет на MANAGER, а не на COURIER
+- Непонятный смысл проверок
+
+### **2. Проверка диапазона допустимых ролей**
+
+```java
+@Service
+@Transactional
+public class UserServiceImpl implements UserService {
+    
+    @Override
+    public List<UserDto> getAllUsers(UserRole role) {
+        ...
+        if (role.ordinal() < 0 || role.ordinal() > 2) {
+            throw new IllegalArgumentException("Неправильная роль");
+        }
+        ...
+    }
+    
+    @Override
+    public UserDto createUser(UserRequest userRequest) {
+        ...
+        if (userRequest.getRole().ordinal() < 0 || userRequest.getRole().ordinal() > 2) {
+            throw new IllegalArgumentException("Неправильная роль");
+        }
+        ...
+    }
+    
+    @Override
+    public UserDto updateUser(Long id, UserUpdateRequest userUpdateRequest) {
+        ...
+        if (userUpdateRequest.getRole() != null &&
+            (userUpdateRequest.getRole().ordinal() < 0 || userUpdateRequest.getRole().ordinal() > 2)) {
+            throw new IllegalArgumentException("Неправильная роль");
+        }
+        ...
+    }
+    
+    public List<UserDto> getAllUsersAgain(UserRole roleParam) {
+        ...
+        if (roleParam.ordinal() < 0 || roleParam.ordinal() > 2) {
+            throw new IllegalArgumentException("Неправильная роль");
+        }
+        ...
     }
     ...
 }
 ```
+
+**Проблемы:**
+- Одинаковая логика проверки в 4 разных методах
+- Жесткая привязка к текущему количеству ролей (3)
+- Неявное знание о количестве ролей в системе
+
+## **Почему данный код является плохим**
+
+- Классы не открыты для расширения (добавления новых ролей)
+- Изменение порядка элементов в enum сломает всю логику
+- Добавление новых элементов в начало/середину enum изменит ordinal существующих
+- Одинаковые проверки разбросаны по разным классам и методам
+
+## **К чему может привести наличие такого кода**
+
+### **Катастрофические последствия при добавлении роли**
+Представим, что нужно добавить новую роль `SUPERVISOR`:
+
 ```java
-@Override
-public void deleteDelivery(Long id) {
-    ...
-    long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-    if (daysBetween < 3) { 
-        throw new IllegalArgumentException("Нельзя удалить доставку менее чем за 3 дня до даты доставки");
-    }
-    ...
+public enum UserRole {
+    ADMIN,        // ordinal = 0 (не изменился)
+    SUPERVISOR,   // ordinal = 1 (НОВЫЙ!)
+    MANAGER,      // ordinal = 2 (ИЗМЕНИЛСЯ! был 1)
+    COURIER       // ordinal = 3 (ИЗМЕНИЛСЯ! был 2)
 }
 ```
-```java
-private void validateRouteTime(DeliveryRequest deliveryRequest) {
-    ...
-    int breakMinutesPerPoint = 30; 
-    ...
-}
-```
-```java
-private void validateRouteTime(DeliveryRequest deliveryRequest) {
-    ...
-    long totalRequiredMinutes = (long)(requiredHours.doubleValue() * 60) + totalBreakMinutes; 
-    ...
-}
-```
+**Все проверки сломаются:**
+- `ordinal() != 2` теперь проверяет не COURIER, а MANAGER
+- `ordinal() == 0` все еще ADMIN
+- `ordinal() < 0 || ordinal() > 2` теперь пропускает COURIER (3 > 2)
 
----
+## **Почему мог появиться данный недостаток**
 
-### Описание недостатка
-
-В коде используются "магические числа" (магические константы) без объяснения их смысла и назначения. Эти числовые значения разбросаны по коду без централизованного определения, что затрудняет их понимание и изменение.
-
----
-
-### Почему данный код является плохим
-
-1. **Непонятный смысл числовых значений**
-
-    * Число `3` — минимальное количество дней до доставки для редактирования/удаления
-    * Число `2` — числовое представление роли курьера (используется ordinal(), что само по себе является антипаттерном)
-    * Число `30` — количество минут перерыва на точку доставки
-    * Число `60` — коэффициент перевода часов в минуты
-
-2. **Сложность поддержки и изменения**
-
-   При необходимости изменить бизнес-правила (например, увеличить лимит редактирования доставки с 3 до 5 дней) потребуется искать все вхождения числа `3` в коде, что чревато ошибками.
-
-3. **Нарушение принципа DRY (Don't Repeat Yourself)**
-
-   Значение `3` используется в двух разных методах (`updateDelivery` и `deleteDelivery`), но определено в каждом из них отдельно.
-
-4. **Использование ordinal() для ролей**
-
-   Сравнение `courier.getRole().ordinal() != 2` является хрупким — изменение порядка элементов в enum сломает логику приложения.
-
-5. **Отсутствие семантики**
-
-   Числовые значения не несут смысловой нагрузки. Что такое `2`? Это ID роли, уровень доступа или что-то еще?
-
----
-
-### К чему может привести наличие такого кода
-
-* **Ошибки при изменении бизнес-логики** — можно изменить значение в одном месте и забыть про другое
-* **Сложность рефакторинга** — необходимо анализировать каждое числовое значение в контексте
-* **Снижение читаемости кода** — новые разработчики тратят время на понимание смысла чисел
-* **Нарушение консистентности** — разные значения в разных частях приложения для одного и того же бизнес-правила
-* **Проблемы с тестированием** — сложно понять граничные значения для тестов
-
----
-
-### Почему мог появиться данный недостаток
-
-* Быстрая разработка без учета долгосрочной поддерживаемости
-* Отсутствие практики выделения констант и конфигурационных параметров
-* Непонимание важности семантического именования
-* Копирование кода без рефакторинга
-* Отсутствие code review, сосредоточенного на качестве кода
-* Следование устаревшим шаблонам кодирования
-* Недостаточное внимание к принципам чистого кода и проектирования
+- Недостаток знаний о enum в Java
+- Непонимание, что `ordinal()` нестабилен при изменениях enum
+- Незнание о существовании безопасных альтернатив
+- Ошибочное убеждение, что ordinal постоянен
