@@ -352,6 +352,8 @@ public class DeliveryControllerTest extends BaseIntegrationTest {
                 .build()
         ));
 
+        System.out.println("TESTING" + deliveryData);
+
         GenerateDeliveriesRequest generateRequest = GenerateDeliveriesRequest.builder()
             .deliveryData(deliveryData)
             .build();

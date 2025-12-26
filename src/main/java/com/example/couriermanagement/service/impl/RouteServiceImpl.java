@@ -69,11 +69,11 @@ public class RouteServiceImpl implements RouteService {
         
         double sinDLatHalf = Math.sin(dLat / 2);
         double sinDLonHalf = Math.sin(dLon / 2);
-        
-        double a = sinDLatHalf * sinDLatHalf + 
+
+        double a = sinDLatHalf * sinDLatHalf +
                 Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * 
                 sinDLonHalf * sinDLonHalf;
-        
+
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         
         return radius * c;

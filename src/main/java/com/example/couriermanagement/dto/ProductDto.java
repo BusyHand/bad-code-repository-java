@@ -24,6 +24,7 @@ public class ProductDto {
     private BigDecimal height;
     private BigDecimal volume;
 
+    //todo должен с этим работать маппер
     public static ProductDto from(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
@@ -36,6 +37,7 @@ public class ProductDto {
                 .build();
     }
 
+    //todo неиспользуемый код
     @Data
     @Builder
     @AllArgsConstructor
@@ -61,6 +63,7 @@ public class ProductDto {
         private BigDecimal height;
     }
 
+    //todo неиспользуемый код
     @Data
     @Builder
     @AllArgsConstructor

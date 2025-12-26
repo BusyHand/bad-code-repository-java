@@ -2,6 +2,7 @@ package com.example.couriermanagement.service;
 
 import java.math.BigDecimal;
 
+//todo Теоретическая общность
 public interface OpenStreetMapService {
     /**
      * Calculate distance between two points using OpenStreetMap routing

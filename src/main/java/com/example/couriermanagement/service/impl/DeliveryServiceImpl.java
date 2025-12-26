@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+//todo Большой класс
 public class DeliveryServiceImpl implements DeliveryService {
     
     private final DeliveryRepository deliveryRepository;
@@ -64,9 +65,12 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    //todo Длинный метод
+    //todo Группы данных
     public List<DeliveryDto> getAllDeliveries(LocalDate date, Long courierId, DeliveryStatus status) {
         List<Delivery> deliveries;
-        
+
+        //todo Условная сложность
         if (date != null && courierId != null && status != null) {
             deliveries = deliveryRepository.findByDeliveryDateAndCourierIdAndStatus(date, courierId, status);
         } else if (date != null && courierId != null) {
@@ -156,6 +160,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         Vehicle vehicle = vehicleRepository.findById(deliveryRequest.getVehicleId())
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
 
+        //todo Расходящиеся модификации 1
         if (courier.getRole().ordinal() != 2) {
             throw new IllegalArgumentException("Пользователь не является курьером");
         }
@@ -184,7 +189,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
         long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-        if (daysBetween < 3) {
+        if (daysBetween < 3) { //todo magconst
             throw new IllegalArgumentException("Нельзя редактировать доставку менее чем за 3 дня до даты доставки");
         }
         
@@ -195,10 +200,10 @@ public class DeliveryServiceImpl implements DeliveryService {
         
         Vehicle vehicle = vehicleRepository.findById(deliveryRequest.getVehicleId())
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
-        
-        if (courier.getRole().ordinal() != 2) {
-            throw new IllegalArgumentException("Пользователь не является курьером");
-        }
+            //todo Расходящиеся модификации 1
+            if (courier.getRole().ordinal() != 2) { //todo magconst
+                throw new IllegalArgumentException("Пользователь не является курьером");
+            }
         
         Delivery updatedDelivery = delivery.toBuilder()
                 .courier(courier)
@@ -229,7 +234,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
         long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-        if (daysBetween < 3) {
+        if (daysBetween < 3) { //todo magconst
             throw new IllegalArgumentException("Нельзя удалить доставку менее чем за 3 дня до даты доставки");
         }
         
@@ -237,6 +242,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
     
     @Override
+    //todo Длинный метод
     public GenerateDeliveriesResponse generateDeliveries(GenerateDeliveriesRequest generateRequest) {
         UserDto currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -413,9 +419,9 @@ public class DeliveryServiceImpl implements DeliveryService {
         BigDecimal speedKmPerHour = BigDecimal.valueOf(60);
         BigDecimal requiredHours = distanceKm.divide(speedKmPerHour, 4, RoundingMode.HALF_UP);
 
-        int breakMinutesPerPoint = 30;
+        int breakMinutesPerPoint = 30; //todo magconst
         int totalBreakMinutes = deliveryRequest.getPoints().size() * breakMinutesPerPoint;
-        long totalRequiredMinutes = (long)(requiredHours.doubleValue() * 60) + totalBreakMinutes;
+        long totalRequiredMinutes = (long)(requiredHours.doubleValue() * 60) + totalBreakMinutes; //todo magconst
 
         LocalTime timeStart = deliveryRequest.getTimeStart();
         LocalTime timeEnd = deliveryRequest.getTimeEnd();
@@ -465,6 +471,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     private void addComplexWarnings(List<String> warnings, LocalDate date, List<User> couriers, 
                                    List<Vehicle> vehicles, List<RouteWithProducts> routes, 
                                    UserDto user) {
+        //todo Условная сложность
         if (date.getDayOfWeek().getValue() == 7) {
             warnings.add("Воскресенье - выходной день");
             if (date.getMonthValue() == 12) {
@@ -477,6 +484,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                             warnings.add("Машины тоже заняты");
                             if (routes.size() > 10) {
                                 warnings.add("Слишком много маршрутов");
+                                //todo Расходящиеся модификации 1
                                 if (user.getRole().ordinal() == 0) {
                                     warnings.add("Администратор не может создать доставки в праздники");
                                 } else {
@@ -535,6 +543,7 @@ public class DeliveryServiceImpl implements DeliveryService {
             warnings.add("Нет товаров в маршруте");
             return false;
         }
+        //todo Расходящиеся модификации 1
         if (courier.getRole().ordinal() != 1) {
             warnings.add("Пользователь не курьер");
             return false;

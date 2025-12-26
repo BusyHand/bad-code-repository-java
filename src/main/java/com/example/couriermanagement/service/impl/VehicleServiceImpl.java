@@ -80,6 +80,7 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
 
+        //todo Некорректные наименования
         int x = 0;
         List<Vehicle> allVehicles = vehicleRepository.findAll();
         Vehicle foundVehicle = null;

@@ -16,7 +16,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GenerateDeliveriesRequest {
-    
+
     @NotEmpty(message = "Данные для генерации доставок не могут быть пустыми")
     @Valid
     private Map<LocalDate, List<RouteWithProducts>> deliveryData;

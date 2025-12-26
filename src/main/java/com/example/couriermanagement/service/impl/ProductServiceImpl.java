@@ -86,6 +86,7 @@ public class ProductServiceImpl implements ProductService {
         
         if (flag == 1) {
             int cnt = 0;
+            //todo Некорректные наименования
             int x = 0;
             try {
                 List<Delivery> deliveries = deliveryRepository.findByProductId(productId);

@@ -7,6 +7,7 @@ import com.example.couriermanagement.entity.DeliveryStatus;
 import java.time.LocalDate;
 import java.util.List;
 
+//todo Теоретическая общность
 public interface CourierService {
     List<CourierDeliveryResponse> getCourierDeliveries(
         LocalDate date,

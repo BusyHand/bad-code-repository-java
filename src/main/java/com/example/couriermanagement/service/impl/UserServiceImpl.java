@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+//todo Большой класс
 public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
@@ -49,6 +50,7 @@ public class UserServiceImpl implements UserService {
         UserRole filterRole = null;
         if (role != null) {
             try {
+                //todo Расходящиеся модификации 1
                 if (role.ordinal() < 0 || role.ordinal() > 2) {
                     throw new IllegalArgumentException("Неправильная роль");
                 }
@@ -59,7 +61,7 @@ public class UserServiceImpl implements UserService {
                 filterRole = null;
             }
         }
-        
+        //todo повтор
         List<User> users;
         if (filterRole != null) {
             List<User> userList = userRepository.findByRole(filterRole);
@@ -120,6 +122,7 @@ public class UserServiceImpl implements UserService {
         if (userRequest.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Пароль не может быть пустым");
         }
+        //todo Расходящиеся модификации 1
         if (userRequest.getRole().ordinal() < 0 || userRequest.getRole().ordinal() > 2) {
             throw new IllegalArgumentException("Неправильная роль");
         }
@@ -175,7 +178,8 @@ public class UserServiceImpl implements UserService {
                 throw new IllegalArgumentException("Пользователь с таким логином уже существует");
             }
         }
-
+        //todo Условная сложность
+        //todo повтор
         if (userUpdateRequest.getLogin() != null && userUpdateRequest.getLogin().isEmpty()) {
             throw new IllegalArgumentException("Логин не может быть пустым");
         }
@@ -185,11 +189,13 @@ public class UserServiceImpl implements UserService {
         if (userUpdateRequest.getPassword() != null && userUpdateRequest.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Пароль не может быть пустым");
         }
-        if (userUpdateRequest.getRole() != null && 
+        if (userUpdateRequest.getRole() != null &&
+                //todo Расходящиеся модификации 1
             (userUpdateRequest.getRole().ordinal() < 0 || userUpdateRequest.getRole().ordinal() > 2)) {
             throw new IllegalArgumentException("Неправильная роль");
         }
-        
+        //todo Условная сложность
+        //todo повтор
         User.UserBuilder builder = user.toBuilder()
                 .login(userUpdateRequest.getLogin() != null ? userUpdateRequest.getLogin() : user.getLogin())
                 .name(userUpdateRequest.getName() != null ? userUpdateRequest.getName() : user.getName())
@@ -249,12 +255,14 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsersAgain(UserRole roleParam) {
         UserRole role = null;
         if (roleParam != null) {
+            //todo Расходящиеся модификации 1
             if (roleParam.ordinal() < 0 || roleParam.ordinal() > 2) {
                 throw new IllegalArgumentException("Неправильная роль");
             }
             role = roleParam;
         }
-        
+
+        //todo повтор
         List<User> users;
         if (role != null) {
             List<User> userList = userRepository.findByRole(role);
@@ -295,10 +303,12 @@ public class UserServiceImpl implements UserService {
         // Placeholder for delivery flow processor method
     }
 
+    //todo повтор
     private void validateUser2(Long userId) {
         // Placeholder for validation utility method
     }
 
+    //todo повтор
     private void processSystemEvent(Exception e) {
         // Placeholder for system monitoring service method
     }
@@ -307,6 +317,7 @@ public class UserServiceImpl implements UserService {
         // Placeholder for delivery flow processor method
     }
 
+    //todo повтор
     private void recordAndContinue(RuntimeException e) {
         // Placeholder for system monitoring service method
     }
@@ -336,6 +347,7 @@ public class UserServiceImpl implements UserService {
         return "normal";
     }
 
+    //todo повтор
     private void validateUser1(Long userId) {
         // Placeholder for validation utility method
     }

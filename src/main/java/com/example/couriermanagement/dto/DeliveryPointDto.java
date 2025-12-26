@@ -22,6 +22,7 @@ public class DeliveryPointDto {
     @Builder.Default
     private List<DeliveryPointProductDto> products = List.of();
 
+    //todo должен с этим работать маппер
     public static DeliveryPointDto from(DeliveryPoint deliveryPoint) {
         return DeliveryPointDto.builder()
                 .id(deliveryPoint.getId())

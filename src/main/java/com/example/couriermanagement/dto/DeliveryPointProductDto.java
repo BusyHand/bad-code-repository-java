@@ -15,6 +15,7 @@ public class DeliveryPointProductDto {
     private ProductDto product;
     private Integer quantity;
 
+    //todo должен с этим работать маппер
     public static DeliveryPointProductDto from(DeliveryPointProduct deliveryPointProduct) {
         return DeliveryPointProductDto.builder()
                 .id(deliveryPointProduct.getId())

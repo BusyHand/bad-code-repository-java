@@ -2,8 +2,11 @@ package com.example.couriermanagement.dto.response;
 
 import com.example.couriermanagement.dto.UserDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+
 import java.util.Objects;
 
+//todo везде использовали lombok, а тут то че нет?
 @Schema(description = "Ответ при успешной авторизации")
 public class LoginResponse {
     @Schema(description = "JWT токен", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")

@@ -28,7 +28,8 @@ public class AuthServiceImpl implements AuthService {
     }
     
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(LoginRequest loginRequest) { //todo привязка к конретной дто(а если нужна будет другая??)
+        //todo есть лучше способ использовать optional
         Optional<User> userOptional = userRepository.findByLogin(loginRequest.getLogin());
         if (userOptional.isEmpty()) {
             throw new IllegalArgumentException("Invalid login or password");
@@ -43,17 +44,20 @@ public class AuthServiceImpl implements AuthService {
         
         return new LoginResponse(token, UserDto.from(user));
     }
-    
+    //todo подозрение что этого здесь не должно быть
     @Override
     public UserDto getCurrentUser() {
+        //todo есть лучше способ использовать optional
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
+            //todo возвращаем null
             return null;
         }
         
         String username = authentication.getName();
         Optional<User> userOptional = userRepository.findByLogin(username);
         if (userOptional.isEmpty()) {
+            //todo возвращаем null
             return null;
         }
         
