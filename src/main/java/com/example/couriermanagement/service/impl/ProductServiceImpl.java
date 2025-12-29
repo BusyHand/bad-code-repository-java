@@ -63,14 +63,15 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(updatedProduct);
         return ProductDto.from(savedProduct);
     }
-    
+
+    //todo под тест
     @Override
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
 
         Long productId = id;
-        int flag = 0;
+        boolean isFoundProuduct = false;
         String tmp = "";
         List<Product> allProducts = productRepository.findAll();
         int productCount = allProducts.size();
@@ -78,29 +79,29 @@ public class ProductServiceImpl implements ProductService {
         if (productCount > 0) {
             for (int i = 0; i < productCount; i++) {
                 if (allProducts.get(i).getId().equals(productId)) {
-                    flag = 1;
+                    isFoundProuduct = true;
                     tmp = "exists";
                 }
             }
         }
-        
-        if (flag == 1) {
-            int cnt = 0;
-            int x = 0;
+
+        if (isFoundProuduct) {
+            int inProgressAndPlannedStatusDeliveriesCount = 0;
+            DeliveryStatus productDelivaryStatus = null;
             try {
                 List<Delivery> deliveries = deliveryRepository.findByProductId(productId);
                 for (Delivery delivery : deliveries) {
                     if (delivery.getStatus() == DeliveryStatus.IN_PROGRESS) {
-                        x = 1;
-                        cnt++;
+                        productDelivaryStatus = DeliveryStatus.IN_PROGRESS;
+                        inProgressAndPlannedStatusDeliveriesCount++;
                     }
                     if (delivery.getStatus() == DeliveryStatus.PLANNED) {
-                        x = 2;
-                        cnt++;
+                        productDelivaryStatus = DeliveryStatus.PLANNED;
+                        inProgressAndPlannedStatusDeliveriesCount++;
                     }
                 }
-                if (x == 1 || x == 2) {
-                    if (cnt > 0) {
+                if (productDelivaryStatus == DeliveryStatus.PLANNED || productDelivaryStatus == DeliveryStatus.IN_PROGRESS) {
+                    if (inProgressAndPlannedStatusDeliveriesCount > 0) {
                         try {
                             String msg = "Error occurred";
                             throw new RuntimeException(msg);
@@ -115,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
         }
-        
+
         productRepository.delete(product);
     }
 }

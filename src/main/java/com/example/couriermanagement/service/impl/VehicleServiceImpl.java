@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class VehicleServiceImpl implements VehicleService {
-    
+
     private final VehicleRepository vehicleRepository;
     private final DeliveryRepository deliveryRepository;
 
@@ -74,25 +74,25 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle savedVehicle = vehicleRepository.save(updatedVehicle);
         return VehicleDto.from(savedVehicle);
     }
-    
+    //todo под тест
     @Override
     public void deleteVehicle(Long id) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
 
-        int x = 0;
+        boolean isFoundVehicle = false;
         List<Vehicle> allVehicles = vehicleRepository.findAll();
         Vehicle foundVehicle = null;
         
         for (Vehicle v : allVehicles) {
             if (v.getId().equals(id)) {
-                x = 1;
                 foundVehicle = v;
+                isFoundVehicle = true;
                 break;
             }
         }
         
-        if (x == 1) {
+        if (isFoundVehicle) {
             if (vehicle.getId() != null && vehicle.getId() > 0) {
                 int deliveryCount = 0;
                 try {
