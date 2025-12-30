@@ -31,7 +31,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class DeliveryServiceImpl implements DeliveryService {
-    
+
+    public static final int MAX_DAYS_TO_UPDATE_DELIVERY = 3;
+    public static final int MAX_DAYS_TO_DELETE_DELIVERY = 3;
+    public static final int COURIER_INDEX = 2;
+    public static final int MINUTES_IN_HOUR = 60;
     private final DeliveryRepository deliveryRepository;
     private final DeliveryPointRepository deliveryPointRepository;
     private final DeliveryPointProductRepository deliveryPointProductRepository;
@@ -184,7 +188,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
         long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-        if (daysBetween < 3) {
+        if (daysBetween < MAX_DAYS_TO_UPDATE_DELIVERY) {
             throw new IllegalArgumentException("Нельзя редактировать доставку менее чем за 3 дня до даты доставки");
         }
         
@@ -196,7 +200,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         Vehicle vehicle = vehicleRepository.findById(deliveryRequest.getVehicleId())
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
         
-        if (courier.getRole().ordinal() != 2) {
+        if (courier.getRole().ordinal() != COURIER_INDEX) {
             throw new IllegalArgumentException("Пользователь не является курьером");
         }
         
@@ -229,7 +233,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
         long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), delivery.getDeliveryDate());
-        if (daysBetween < 3) {
+        if (daysBetween < MAX_DAYS_TO_DELETE_DELIVERY) {
             throw new IllegalArgumentException("Нельзя удалить доставку менее чем за 3 дня до даты доставки");
         }
         
@@ -410,12 +414,12 @@ public class DeliveryServiceImpl implements DeliveryService {
             lastPoint.getLongitude()
         );
 
-        BigDecimal speedKmPerHour = BigDecimal.valueOf(60);
+        BigDecimal speedKmPerHour = BigDecimal.valueOf(MINUTES_IN_HOUR);
         BigDecimal requiredHours = distanceKm.divide(speedKmPerHour, 4, RoundingMode.HALF_UP);
 
         int breakMinutesPerPoint = 30;
         int totalBreakMinutes = deliveryRequest.getPoints().size() * breakMinutesPerPoint;
-        long totalRequiredMinutes = (long)(requiredHours.doubleValue() * 60) + totalBreakMinutes;
+        long totalRequiredMinutes = (long)(requiredHours.doubleValue() * MINUTES_IN_HOUR) + totalBreakMinutes;
 
         LocalTime timeStart = deliveryRequest.getTimeStart();
         LocalTime timeEnd = deliveryRequest.getTimeEnd();
