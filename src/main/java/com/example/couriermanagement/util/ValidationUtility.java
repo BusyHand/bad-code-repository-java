@@ -2,20 +2,33 @@ package com.example.couriermanagement.util;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 //todo Ленивый класс
 @Component
 public class ValidationUtility {
-    //todo Неприличная демонстрация
-    public Map<String, Object> validationLogs = new HashMap<>();
-    //todo Неприличная демонстрация
-    public Map<Long, String> deliveryCache = new HashMap<>();
-    //todo Неприличная демонстрация
-    public int errorCount = 0;
-    //todo Неприличная демонстрация
-    public String processingMode = "default";
+    private final Map<String, Object> VALIDATION_LOGS = new HashMap<>();
+    private final Map<Long, String> DELIVERY_CACHE = new HashMap<>();
+    private int errorCount = 0;
+    private final String PROCESSING_MODE = "default";
+
+    public String getPROCESSING_MODE() {
+        return PROCESSING_MODE;
+    }
+
+    public int getErrorCount() {
+        return errorCount;
+    }
+
+    public Map<Long, String> getDELIVERY_CACHE() {
+        return Collections.unmodifiableMap(DELIVERY_CACHE);
+    }
+
+    public Map<String, Object> getVALIDATION_LOGS() {
+        return Collections.unmodifiableMap(VALIDATION_LOGS);
+    }
 
     public void userIdValidation(Long userId) {
         if (userId == null || userId <= 0) {
@@ -35,6 +48,6 @@ public class ValidationUtility {
     //todo Некорректные наименования
     public void processUserIdValidationAndLog(Long userId) {
         userIdValidation(userId);
-        validationLogs.put("user_" + userId, "processed");
+        VALIDATION_LOGS.put("user_" + userId, "processed");
     }
 }
