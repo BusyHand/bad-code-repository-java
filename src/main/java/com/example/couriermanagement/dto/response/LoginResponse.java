@@ -2,6 +2,7 @@ package com.example.couriermanagement.dto.response;
 
 import com.example.couriermanagement.dto.UserDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 @Schema(description = "Ответ при успешной авторизации")
@@ -12,7 +13,8 @@ public class LoginResponse {
     @Schema(description = "Информация о пользователе")
     private UserDto user;
 
-    public LoginResponse() {}
+    public LoginResponse() {
+    }
 
     public LoginResponse(String token, UserDto user) {
         this.token = token;

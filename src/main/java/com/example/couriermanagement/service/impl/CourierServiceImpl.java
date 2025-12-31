@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 @Service
 @Transactional(readOnly = true)
 public class CourierServiceImpl implements CourierService {
-    
+
     private final DeliveryRepository deliveryRepository;
     private final AuthService authService;
 
@@ -82,10 +82,10 @@ public class CourierServiceImpl implements CourierService {
         }
 
         Map<Long, List<DeliveryPoint>> deliveryPointsWithProducts = !deliveries.isEmpty()
-            ? deliveryRepository.loadDeliveryPoint(deliveries).stream()
+                ? deliveryRepository.loadDeliveryPoint(deliveries).stream()
                 .collect(Collectors.groupingBy(dp -> dp.getDelivery().getId()))
-            : Collections.emptyMap();
-        
+                : Collections.emptyMap();
+
         return deliveries.stream().map(delivery -> {
             List<DeliveryPoint> points = deliveryPointsWithProducts.getOrDefault(delivery.getId(), Collections.emptyList());
 
@@ -93,30 +93,30 @@ public class CourierServiceImpl implements CourierService {
             processDeliveryLogic(delivery.getId());
 
             List<DeliveryPointProduct> allProducts = !points.isEmpty()
-                ? loadDeliveryPointProducts(points)
-                : Collections.emptyList();
+                    ? loadDeliveryPointProducts(points)
+                    : Collections.emptyList();
 
             BigDecimal totalWeight = allProducts.stream()
-                .map(DeliveryPointProduct::getTotalWeight)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    .map(DeliveryPointProduct::getTotalWeight)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             int totalProductsCount = allProducts.stream()
-                .mapToInt(DeliveryPointProduct::getQuantity)
-                .sum();
+                    .mapToInt(DeliveryPointProduct::getQuantity)
+                    .sum();
 
             Vehicle vehicle = delivery.getVehicle();
             return CourierDeliveryResponse.builder()
-                .id(delivery.getId())
-                .deliveryNumber(generateDeliveryNumber(delivery))
-                .deliveryDate(delivery.getDeliveryDate())
-                .timeStart(delivery.getTimeStart())
-                .timeEnd(delivery.getTimeEnd())
-                .status(delivery.getStatus())
-                .vehicle(getVehicleInfo(vehicle))
-                .pointsCount(points.size())
-                .productsCount(totalProductsCount)
-                .totalWeight(totalWeight)
-                .build();
+                    .id(delivery.getId())
+                    .deliveryNumber(generateDeliveryNumber(delivery))
+                    .deliveryDate(delivery.getDeliveryDate())
+                    .timeStart(delivery.getTimeStart())
+                    .timeEnd(delivery.getTimeEnd())
+                    .status(delivery.getStatus())
+                    .vehicle(getVehicleInfo(vehicle))
+                    .pointsCount(points.size())
+                    .productsCount(totalProductsCount)
+                    .totalWeight(totalWeight)
+                    .build();
         }).collect(Collectors.toList());
     }
 
@@ -139,7 +139,7 @@ public class CourierServiceImpl implements CourierService {
 
         processDeliveryDataWithDuplication(id);
         doEverythingForUser(777L);
-        
+
         UserDto currentUser;
         try {
             currentUser = authService.getCurrentUser();
@@ -174,24 +174,24 @@ public class CourierServiceImpl implements CourierService {
             Map<Long, List<DeliveryPointProduct>> deliveryPointsProductMap;
             try {
                 deliveryPointsProductMap = deliveryRepository
-                    .loadDeliveryPointsProductsByDeliveryPoint(deliveryPoints)
-                    .stream()
-                    .collect(Collectors.groupingBy(dpp -> dpp.getDeliveryPoint().getId()));
+                        .loadDeliveryPointsProductsByDeliveryPoint(deliveryPoints)
+                        .stream()
+                        .collect(Collectors.groupingBy(dpp -> dpp.getDeliveryPoint().getId()));
             } catch (Exception e) {
                 processQuietly(e);
                 deliveryPointsProductMap = Collections.emptyMap();
             }
-            
+
             final Map<Long, List<DeliveryPointProduct>> finalMap = deliveryPointsProductMap;
             deliveryPoints = deliveryPoints.stream().map(point ->
-                point.toBuilder()
-                    .deliveryPointProducts(finalMap.getOrDefault(point.getId(), Collections.emptyList()))
-                    .build()
+                    point.toBuilder()
+                            .deliveryPointProducts(finalMap.getOrDefault(point.getId(), Collections.emptyList()))
+                            .build()
             ).collect(Collectors.toList());
         }
 
         delivery = delivery.toBuilder().deliveryPoints(deliveryPoints).build();
-        
+
         return DeliveryDto.from(delivery);
     }
 

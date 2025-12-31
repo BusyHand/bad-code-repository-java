@@ -29,17 +29,17 @@ public class RouteController {
 
     @PostMapping("/calculate")
     @Operation(
-        summary = "Рассчитать время маршрута",
-        description = "Используется для проверки времени при создании доставки"
+            summary = "Рассчитать время маршрута",
+            description = "Используется для проверки времени при создании доставки"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Расчет маршрута"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Расчет маршрута"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации")
+            }
     )
     public ResponseEntity<RouteCalculationResponse> calculateRoute(
-        @Valid @RequestBody RouteCalculationRequest request
+            @Valid @RequestBody RouteCalculationRequest request
     ) {
         RouteCalculationResponse response = routeService.calculateRoute(request);
         return ResponseEntity.ok(response);

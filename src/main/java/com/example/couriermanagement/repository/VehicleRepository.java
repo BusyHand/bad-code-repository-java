@@ -13,26 +13,26 @@ import java.util.Optional;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
-    
+
     Optional<Vehicle> findByLicensePlate(String licensePlate);
-    
+
     @Query("""
-        SELECT v FROM Vehicle v 
-        WHERE v.maxWeight >= :minWeight AND v.maxVolume >= :minVolume
-    """)
+                SELECT v FROM Vehicle v 
+                WHERE v.maxWeight >= :minWeight AND v.maxVolume >= :minVolume
+            """)
     List<Vehicle> findByMinCapacity(
-        @Param("minWeight") BigDecimal minWeight,
-        @Param("minVolume") BigDecimal minVolume
+            @Param("minWeight") BigDecimal minWeight,
+            @Param("minVolume") BigDecimal minVolume
     );
-    
+
     @Query("""
-        SELECT v FROM Vehicle v 
-        WHERE v.id NOT IN (
-            SELECT d.vehicle.id FROM Delivery d 
-            WHERE d.deliveryDate = :date AND d.vehicle IS NOT NULL
-        )
-    """)
+                SELECT v FROM Vehicle v 
+                WHERE v.id NOT IN (
+                    SELECT d.vehicle.id FROM Delivery d 
+                    WHERE d.deliveryDate = :date AND d.vehicle IS NOT NULL
+                )
+            """)
     List<Vehicle> findAvailableVehiclesForDate(@Param("date") LocalDate date);
-    
+
     boolean existsByLicensePlate(String licensePlate);
 }

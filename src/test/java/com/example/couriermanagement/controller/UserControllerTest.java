@@ -9,15 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserControllerTest extends BaseIntegrationTest {
 
     @Test
     public void getAllUsersAsAdminShouldSucceed() throws Exception {
         expectSuccess(getWithAuth("/users", adminToken))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$.length()").value(3)); // admin, manager, courier
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(3)); // admin, manager, courier
     }
 
     @Test
@@ -38,35 +39,35 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void getUsersFilteredByRoleShouldReturnFilteredResults() throws Exception {
         expectSuccess(getWithAuth("/users?role=COURIER", adminToken))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].role").value("COURIER"));
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].role").value("COURIER"));
     }
 
     @Test
     public void createUserAsAdminShouldSucceed() throws Exception {
         UserRequest userRequest = UserRequest.builder()
-            .login("newcourier")
-            .password("password123")
-            .name("Новый Курьер")
-            .role(UserRole.COURIER)
-            .build();
+                .login("newcourier")
+                .password("password123")
+                .name("Новый Курьер")
+                .role(UserRole.COURIER)
+                .build();
 
         expectSuccess(postJson("/users", userRequest, adminToken))
-            .andExpect(jsonPath("$.login").value("newcourier"))
-            .andExpect(jsonPath("$.name").value("Новый Курьер"))
-            .andExpect(jsonPath("$.role").value("COURIER"))
-            .andExpect(jsonPath("$.id").exists());
+                .andExpect(jsonPath("$.login").value("newcourier"))
+                .andExpect(jsonPath("$.name").value("Новый Курьер"))
+                .andExpect(jsonPath("$.role").value("COURIER"))
+                .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
     public void createUserAsManagerShouldReturn403() throws Exception {
         UserRequest userRequest = UserRequest.builder()
-            .login("newcourier")
-            .password("password123")
-            .name("Новый Курьер")
-            .role(UserRole.COURIER)
-            .build();
+                .login("newcourier")
+                .password("password123")
+                .name("Новый Курьер")
+                .role(UserRole.COURIER)
+                .build();
 
         expectForbidden(postJson("/users", userRequest, managerToken));
     }
@@ -74,11 +75,11 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void createUserWithDuplicateLoginShouldReturn400() throws Exception {
         UserRequest userRequest = UserRequest.builder()
-            .login("admin") // Already exists
-            .password("password123")
-            .name("Другой Админ")
-            .role(UserRole.ADMIN)
-            .build();
+                .login("admin") // Already exists
+                .password("password123")
+                .name("Другой Админ")
+                .role(UserRole.ADMIN)
+                .build();
 
         expectBadRequest(postJson("/users", userRequest, adminToken));
     }
@@ -86,11 +87,11 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void createUserWithInvalidDataShouldReturn400() throws Exception {
         UserRequest userRequest = UserRequest.builder()
-            .login("") // Empty login
-            .password("") // Empty password
-            .name("") // Empty name
-            .role(UserRole.COURIER)
-            .build();
+                .login("") // Empty login
+                .password("") // Empty password
+                .name("") // Empty name
+                .role(UserRole.COURIER)
+                .build();
 
         expectBadRequest(postJson("/users", userRequest, adminToken));
     }
@@ -98,36 +99,36 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void createManagerUserShouldSucceed() throws Exception {
         UserRequest userRequest = UserRequest.builder()
-            .login("newmanager")
-            .password("password123")
-            .name("Новый Менеджер")
-            .role(UserRole.MANAGER)
-            .build();
+                .login("newmanager")
+                .password("password123")
+                .name("Новый Менеджер")
+                .role(UserRole.MANAGER)
+                .build();
 
         expectSuccess(postJson("/users", userRequest, adminToken))
-            .andExpect(jsonPath("$.role").value("MANAGER"));
+                .andExpect(jsonPath("$.role").value("MANAGER"));
     }
 
     @Test
     public void updateUserAsAdminShouldSucceed() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
-            .name("Обновленное Имя")
-            .login("updatedcourier")
-            .role(UserRole.MANAGER)
-            .password("newpassword")
-            .build();
+                .name("Обновленное Имя")
+                .login("updatedcourier")
+                .role(UserRole.MANAGER)
+                .password("newpassword")
+                .build();
 
         expectSuccess(putJson("/users/" + courierUser.getId(), updateRequest, adminToken))
-            .andExpect(jsonPath("$.name").value("Обновленное Имя"))
-            .andExpect(jsonPath("$.login").value("updatedcourier"))
-            .andExpect(jsonPath("$.role").value("MANAGER"));
+                .andExpect(jsonPath("$.name").value("Обновленное Имя"))
+                .andExpect(jsonPath("$.login").value("updatedcourier"))
+                .andExpect(jsonPath("$.role").value("MANAGER"));
     }
 
     @Test
     public void updateUserAsManagerShouldReturn403() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
-            .name("Обновленное Имя")
-            .build();
+                .name("Обновленное Имя")
+                .build();
 
         expectForbidden(putJson("/users/" + courierUser.getId(), updateRequest, managerToken));
     }
@@ -135,8 +136,8 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void updateUserWithDuplicateLoginShouldReturn400() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
-            .login("admin") // Already exists
-            .build();
+                .login("admin") // Already exists
+                .build();
 
         expectBadRequest(putJson("/users/" + courierUser.getId(), updateRequest, adminToken));
     }
@@ -144,8 +145,8 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void updateNonExistentUserShouldReturn404() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
-            .name("Обновленное Имя")
-            .build();
+                .name("Обновленное Имя")
+                .build();
 
         expectBadRequest(putJson("/users/999", updateRequest, adminToken)); // Service throws IllegalArgumentException, which becomes 400
     }
@@ -153,33 +154,33 @@ public class UserControllerTest extends BaseIntegrationTest {
     @Test
     public void updateUserPartialDataShouldSucceed() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
-            .name("Только Новое Имя")
-            .build();
+                .name("Только Новое Имя")
+                .build();
 
         expectSuccess(putJson("/users/" + courierUser.getId(), updateRequest, adminToken))
-            .andExpect(jsonPath("$.name").value("Только Новое Имя"))
-            .andExpect(jsonPath("$.login").value(courierUser.getLogin())) // Unchanged
-            .andExpect(jsonPath("$.role").value(courierUser.getRole().name())); // Unchanged
+                .andExpect(jsonPath("$.name").value("Только Новое Имя"))
+                .andExpect(jsonPath("$.login").value(courierUser.getLogin())) // Unchanged
+                .andExpect(jsonPath("$.role").value(courierUser.getRole().name())); // Unchanged
     }
 
     @Test
     public void deleteUserAsAdminShouldSucceed() throws Exception {
         // Create a user to delete
         UserRequest userRequest = UserRequest.builder()
-            .login("todelete")
-            .password("password123")
-            .name("Для Удаления")
-            .role(UserRole.COURIER)
-            .build();
-        
+                .login("todelete")
+                .password("password123")
+                .name("Для Удаления")
+                .role(UserRole.COURIER)
+                .build();
+
         MvcResult createResponse = expectSuccess(postJson("/users", userRequest, adminToken))
-            .andReturn();
-        
+                .andReturn();
+
         JsonNode responseJson = objectMapper.readTree(createResponse.getResponse().getContentAsString());
         Long createdUserId = responseJson.get("id").asLong();
 
         deleteWithAuth("/users/" + createdUserId, adminToken)
-            .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent());
     }
 
     @Test

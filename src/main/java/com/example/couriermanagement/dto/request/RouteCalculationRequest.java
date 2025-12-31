@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -17,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(description = "Запрос для расчета маршрута")
 public class RouteCalculationRequest {
-    
+
     @NotEmpty(message = "Точки маршрута обязательны")
     @Valid
     @Schema(description = "Точки маршрута (минимум 2)")

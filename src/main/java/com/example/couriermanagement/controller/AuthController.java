@@ -36,15 +36,15 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(
-        summary = "Вход в систему",
-        description = "Аутентификация пользователя по логину и паролю"
+            summary = "Вход в систему",
+            description = "Аутентификация пользователя по логину и паролю"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Успешная авторизация"),
-            @ApiResponse(responseCode = "401", description = "Неверные данные для входа"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Успешная авторизация"),
+                    @ApiResponse(responseCode = "401", description = "Неверные данные для входа"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации")
+            }
     )
     @SecurityRequirement(name = "")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -58,7 +58,7 @@ public class AuthController {
         Optional<User> adminUserOptional = userRepository.findByLogin("admin");
         String newHash = passwordEncoder.encode("admin123");
         Map<String, String> result = new HashMap<>();
-        
+
         if (adminUserOptional.isPresent()) {
             User adminUser = adminUserOptional.get();
             result.put("currentHash", adminUser.getPasswordHash());
@@ -71,7 +71,7 @@ public class AuthController {
         } else {
             result.put("error", "Admin user not found");
         }
-        
+
         return ResponseEntity.ok(result);
     }
 }

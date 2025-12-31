@@ -52,7 +52,7 @@ public class DeliveryDto {
 
         return DeliveryDto.builder()
                 .id(delivery.getId())
-                .deliveryNumber("DEL-" + delivery.getDeliveryDate().getYear() + "-" + 
+                .deliveryNumber("DEL-" + delivery.getDeliveryDate().getYear() + "-" +
                         String.format("%03d", delivery.getId()))
                 .courier(delivery.getCourier() != null ? UserDto.from(delivery.getCourier()) : null)
                 .vehicle(delivery.getVehicle() != null ? VehicleDto.from(delivery.getVehicle()) : null)

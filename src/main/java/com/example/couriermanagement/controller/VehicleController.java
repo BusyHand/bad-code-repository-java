@@ -31,14 +31,14 @@ public class VehicleController {
 
     @GetMapping
     @Operation(
-        summary = "Получить список всех машин",
-        description = "Получение списка всех зарегистрированных в системе машин"
+            summary = "Получить список всех машин",
+            description = "Получение списка всех зарегистрированных в системе машин"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Список машин"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Список машин"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<List<VehicleDto>> getAllVehicles() {
         List<VehicleDto> vehicles = vehicleService.getAllVehicles();
@@ -48,15 +48,15 @@ public class VehicleController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Создать новую машину",
-        description = "Создание новой машины. Доступно только для админа"
+            summary = "Создать новую машину",
+            description = "Создание новой машины. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "201", description = "Машина создана"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "201", description = "Машина создана"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<VehicleDto> createVehicle(@Valid @RequestBody VehicleRequest vehicleRequest) {
         VehicleDto vehicle = vehicleService.createVehicle(vehicleRequest);
@@ -66,21 +66,21 @@ public class VehicleController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Обновить данные машины",
-        description = "Обновление данных машины. Доступно только для админа"
+            summary = "Обновить данные машины",
+            description = "Обновление данных машины. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Машина обновлена"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-            @ApiResponse(responseCode = "404", description = "Машина не найдена")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Машина обновлена"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+                    @ApiResponse(responseCode = "404", description = "Машина не найдена")
+            }
     )
     public ResponseEntity<VehicleDto> updateVehicle(
-        @Parameter(description = "ID машины", example = "1")
-        @PathVariable Long id,
-        @Valid @RequestBody VehicleRequest vehicleRequest
+            @Parameter(description = "ID машины", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody VehicleRequest vehicleRequest
     ) {
         VehicleDto vehicle = vehicleService.updateVehicle(id, vehicleRequest);
         return ResponseEntity.ok(vehicle);
@@ -89,19 +89,19 @@ public class VehicleController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Удалить машину",
-        description = "Удаление машины из системы. Доступно только для админа"
+            summary = "Удалить машину",
+            description = "Удаление машины из системы. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "204", description = "Машина удалена"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-            @ApiResponse(responseCode = "404", description = "Машина не найдена")
-        }
+            value = {
+                    @ApiResponse(responseCode = "204", description = "Машина удалена"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+                    @ApiResponse(responseCode = "404", description = "Машина не найдена")
+            }
     )
     public ResponseEntity<Void> deleteVehicle(
-        @Parameter(description = "ID машины", example = "1")
-        @PathVariable Long id
+            @Parameter(description = "ID машины", example = "1")
+            @PathVariable Long id
     ) {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.noContent().build();

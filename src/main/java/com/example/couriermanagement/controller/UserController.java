@@ -34,18 +34,18 @@ public class UserController {
 
     @GetMapping
     @Operation(
-        summary = "Получить список пользователей",
-        description = "Получение списка пользователей с возможностью фильтрации по роли. Доступно только для админа"
+            summary = "Получить список пользователей",
+            description = "Получение списка пользователей с возможностью фильтрации по роли. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Список пользователей"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Список пользователей"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<List<UserDto>> getAllUsers(
-        @Parameter(description = "Фильтр по роли пользователя")
-        @RequestParam(required = false) UserRole role
+            @Parameter(description = "Фильтр по роли пользователя")
+            @RequestParam(required = false) UserRole role
     ) {
         List<UserDto> users = userService.getAllUsers(role);
         return ResponseEntity.ok(users);
@@ -53,15 +53,15 @@ public class UserController {
 
     @PostMapping
     @Operation(
-        summary = "Создать нового пользователя",
-        description = "Создание нового пользователя. Доступно только для админа"
+            summary = "Создать нового пользователя",
+            description = "Создание нового пользователя. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "201", description = "Пользователь создан"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "201", description = "Пользователь создан"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserRequest userRequest) {
         UserDto user = userService.createUser(userRequest);
@@ -70,21 +70,21 @@ public class UserController {
 
     @PutMapping("/{id}")
     @Operation(
-        summary = "Обновить данные пользователя",
-        description = "Обновление данных пользователя. Доступно только для админа"
+            summary = "Обновить данные пользователя",
+            description = "Обновление данных пользователя. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Пользователь обновлен"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Пользователь обновлен"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+                    @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+            }
     )
     public ResponseEntity<UserDto> updateUser(
-        @Parameter(description = "ID пользователя", example = "1")
-        @PathVariable Long id,
-        @Valid @RequestBody UserUpdateRequest userUpdateRequest
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest
     ) {
         UserDto user = userService.updateUser(id, userUpdateRequest);
         return ResponseEntity.ok(user);
@@ -92,19 +92,19 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @Operation(
-        summary = "Удалить пользователя",
-        description = "Удаление пользователя из системы. Доступно только для админа"
+            summary = "Удалить пользователя",
+            description = "Удаление пользователя из системы. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "204", description = "Пользователь удален"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
-        }
+            value = {
+                    @ApiResponse(responseCode = "204", description = "Пользователь удален"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+                    @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+            }
     )
     public ResponseEntity<Void> deleteUser(
-        @Parameter(description = "ID пользователя", example = "1")
-        @PathVariable Long id
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable Long id
     ) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

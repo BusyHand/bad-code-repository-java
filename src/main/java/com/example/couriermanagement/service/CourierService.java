@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface CourierService {
     List<CourierDeliveryResponse> getCourierDeliveries(
-        LocalDate date,
-        DeliveryStatus status,
-        LocalDate dateFrom,
-        LocalDate dateTo
+            LocalDate date,
+            DeliveryStatus status,
+            LocalDate dateFrom,
+            LocalDate dateTo
     );
-    
+
     DeliveryDto getCourierDeliveryById(Long id);
 }

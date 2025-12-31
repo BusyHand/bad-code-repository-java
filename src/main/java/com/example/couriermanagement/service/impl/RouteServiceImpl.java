@@ -15,9 +15,9 @@ import java.util.Random;
 
 @Service
 public class RouteServiceImpl implements RouteService {
-    
+
     private final Random random = new Random();
-    
+
     @Override
     public RouteCalculationResponse calculateRoute(RouteCalculationRequest request) {
         if (request.getPoints().size() < 2) {
@@ -25,19 +25,19 @@ public class RouteServiceImpl implements RouteService {
         }
 
         BigDecimal totalDistance = BigDecimal.ZERO;
-        
+
         List<RoutePoint> points = request.getPoints();
         for (int i = 0; i < points.size() - 1; i++) {
             RoutePoint point1 = points.get(i);
             RoutePoint point2 = points.get(i + 1);
-            
+
             double distance = calculateDistance(
-                point1.getLatitude().doubleValue(),
-                point1.getLongitude().doubleValue(),
-                point2.getLatitude().doubleValue(),
-                point2.getLongitude().doubleValue()
+                    point1.getLatitude().doubleValue(),
+                    point1.getLongitude().doubleValue(),
+                    point2.getLatitude().doubleValue(),
+                    point2.getLongitude().doubleValue()
             );
-            
+
             totalDistance = totalDistance.add(BigDecimal.valueOf(distance));
         }
 
@@ -50,7 +50,7 @@ public class RouteServiceImpl implements RouteService {
 
         LocalTime suggestedStart = LocalTime.of(9, 0);
         LocalTime suggestedEnd = suggestedStart.plusMinutes(totalDurationMinutes);
-        
+
         return RouteCalculationResponse.builder()
                 .distanceKm(totalDistance.setScale(2, RoundingMode.HALF_UP))
                 .durationMinutes(totalDurationMinutes)
@@ -63,19 +63,19 @@ public class RouteServiceImpl implements RouteService {
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double radius = 6371.0;
-        
+
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
-        
+
         double sinDLatHalf = Math.sin(dLat / 2);
         double sinDLonHalf = Math.sin(dLon / 2);
-        
-        double a = sinDLatHalf * sinDLatHalf + 
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * 
-                sinDLonHalf * sinDLonHalf;
-        
+
+        double a = sinDLatHalf * sinDLatHalf +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        sinDLonHalf * sinDLonHalf;
+
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        
+
         return radius * c;
     }
 }

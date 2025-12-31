@@ -31,14 +31,14 @@ public class ProductController {
 
     @GetMapping
     @Operation(
-        summary = "Получить список всех товаров",
-        description = "Получение списка всех товаров в системе"
+            summary = "Получить список всех товаров",
+            description = "Получение списка всех товаров в системе"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Список товаров"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Список товаров"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductDto> products = productService.getAllProducts();
@@ -48,15 +48,15 @@ public class ProductController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Создать новый товар",
-        description = "Создание нового товара. Доступно только для админа"
+            summary = "Создать новый товар",
+            description = "Создание нового товара. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "201", description = "Товар создан"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "201", description = "Товар создан"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductRequest productRequest) {
         ProductDto product = productService.createProduct(productRequest);
@@ -66,21 +66,21 @@ public class ProductController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Обновить данные товара",
-        description = "Обновление данных товара. Доступно только для админа"
+            summary = "Обновить данные товара",
+            description = "Обновление данных товара. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Товар обновлен"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-            @ApiResponse(responseCode = "404", description = "Товар не найден")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Товар обновлен"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+                    @ApiResponse(responseCode = "404", description = "Товар не найден")
+            }
     )
     public ResponseEntity<ProductDto> updateProduct(
-        @Parameter(description = "ID товара", example = "1")
-        @PathVariable Long id,
-        @Valid @RequestBody ProductRequest productRequest
+            @Parameter(description = "ID товара", example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest productRequest
     ) {
         ProductDto product = productService.updateProduct(id, productRequest);
         return ResponseEntity.ok(product);
@@ -89,19 +89,19 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Удалить товар",
-        description = "Удаление товара из системы. Доступно только для админа"
+            summary = "Удалить товар",
+            description = "Удаление товара из системы. Доступно только для админа"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "204", description = "Товар удален"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-            @ApiResponse(responseCode = "404", description = "Товар не найден")
-        }
+            value = {
+                    @ApiResponse(responseCode = "204", description = "Товар удален"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+                    @ApiResponse(responseCode = "404", description = "Товар не найден")
+            }
     )
     public ResponseEntity<Void> deleteProduct(
-        @Parameter(description = "ID товара", example = "1")
-        @PathVariable Long id
+            @Parameter(description = "ID товара", example = "1")
+            @PathVariable Long id
     ) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();

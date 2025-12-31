@@ -6,5 +6,6 @@ import com.example.couriermanagement.dto.response.LoginResponse;
 
 public interface AuthService {
     LoginResponse login(LoginRequest loginRequest);
+
     UserDto getCurrentUser();
 }

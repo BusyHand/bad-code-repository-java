@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Schema(description = "Точка маршрута для расчета")
 public class RoutePoint {
-    
+
     @Schema(description = "Широта", example = "55.7558")
     private BigDecimal latitude;
-    
+
     @Schema(description = "Долгота", example = "37.6173")
     private BigDecimal longitude;
 }

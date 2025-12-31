@@ -11,7 +11,7 @@ import java.math.RoundingMode;
 
 @Service
 public class OpenStreetMapServiceImpl implements OpenStreetMapService {
-    
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final String openRouteServiceUrl = "https://api.openrouteservice.org/v2/directions/driving-car";
@@ -20,7 +20,7 @@ public class OpenStreetMapServiceImpl implements OpenStreetMapService {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
-    
+
     @Override
     public BigDecimal calculateDistance(
             BigDecimal startLatitude,
@@ -28,24 +28,24 @@ public class OpenStreetMapServiceImpl implements OpenStreetMapService {
             BigDecimal endLatitude,
             BigDecimal endLongitude) {
         try {
-            String url = String.format("%s?start=%s,%s&end=%s,%s", 
-                openRouteServiceUrl, startLongitude, startLatitude, endLongitude, endLatitude);
-            
+            String url = String.format("%s?start=%s,%s&end=%s,%s",
+                    openRouteServiceUrl, startLongitude, startLatitude, endLongitude, endLatitude);
+
             String response = restTemplate.getForObject(url, String.class);
             if (response == null) {
                 throw new RuntimeException("Failed to get response from OpenStreetMap");
             }
-            
+
             JsonNode jsonNode = objectMapper.readTree(response);
             BigDecimal distance = extractDistanceFromResponse(jsonNode);
 
             return distance.divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
-            
+
         } catch (Exception e) {
             return calculateHaversineDistance(startLatitude, startLongitude, endLatitude, endLongitude);
         }
     }
-    
+
     private BigDecimal extractDistanceFromResponse(JsonNode jsonNode) {
         JsonNode features = jsonNode.get("features");
         if (features != null && features.isArray() && features.size() > 0) {
@@ -69,20 +69,20 @@ public class OpenStreetMapServiceImpl implements OpenStreetMapService {
             BigDecimal lat2,
             BigDecimal lon2) {
         double earthRadius = 6371.0;
-        
+
         double dLat = Math.toRadians(lat2.doubleValue() - lat1.doubleValue());
         double dLon = Math.toRadians(lon2.doubleValue() - lon1.doubleValue());
-        
+
         double sinDLatHalf = Math.sin(dLat / 2);
         double sinDLonHalf = Math.sin(dLon / 2);
-        
-        double a = sinDLatHalf * sinDLatHalf + 
-                Math.cos(Math.toRadians(lat1.doubleValue())) * 
-                Math.cos(Math.toRadians(lat2.doubleValue())) * 
-                sinDLonHalf * sinDLonHalf;
-        
+
+        double a = sinDLatHalf * sinDLatHalf +
+                Math.cos(Math.toRadians(lat1.doubleValue())) *
+                        Math.cos(Math.toRadians(lat2.doubleValue())) *
+                        sinDLonHalf * sinDLonHalf;
+
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        
+
         return BigDecimal.valueOf(earthRadius * c).setScale(2, RoundingMode.HALF_UP);
     }
 }

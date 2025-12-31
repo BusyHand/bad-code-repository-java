@@ -11,28 +11,28 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    
+
     List<Product> findByNameContainingIgnoreCase(String name);
-    
+
     @Query("""
-        SELECT p FROM Product p 
-        WHERE p.weight <= :maxWeight
-    """)
+                SELECT p FROM Product p 
+                WHERE p.weight <= :maxWeight
+            """)
     List<Product> findByMaxWeight(@Param("maxWeight") BigDecimal maxWeight);
-    
+
     @Query("""
-        SELECT p FROM Product p 
-        WHERE (p.length * p.width * p.height / 1000000) <= :maxVolume
-    """)
+                SELECT p FROM Product p 
+                WHERE (p.length * p.width * p.height / 1000000) <= :maxVolume
+            """)
     List<Product> findByMaxVolume(@Param("maxVolume") BigDecimal maxVolume);
-    
+
     @Query("""
-        SELECT p FROM Product p 
-        WHERE p.weight <= :maxWeight 
-        AND (p.length * p.width * p.height / 1000000) <= :maxVolume
-    """)
+                SELECT p FROM Product p 
+                WHERE p.weight <= :maxWeight 
+                AND (p.length * p.width * p.height / 1000000) <= :maxVolume
+            """)
     List<Product> findByMaxWeightAndVolume(
-        @Param("maxWeight") BigDecimal maxWeight,
-        @Param("maxVolume") BigDecimal maxVolume
+            @Param("maxWeight") BigDecimal maxWeight,
+            @Param("maxVolume") BigDecimal maxVolume
     );
 }

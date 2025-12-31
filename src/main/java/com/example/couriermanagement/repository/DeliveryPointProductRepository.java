@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface DeliveryPointProductRepository extends JpaRepository<DeliveryPointProduct, Long> {
     List<DeliveryPointProduct> findByDeliveryPointId(Long deliveryPointId);
+
     List<DeliveryPointProduct> findByProductId(Long productId);
+
     void deleteByDeliveryPointId(Long deliveryPointId);
 }

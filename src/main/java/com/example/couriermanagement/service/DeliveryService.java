@@ -11,9 +11,14 @@ import java.util.List;
 
 public interface DeliveryService {
     List<DeliveryDto> getAllDeliveries(LocalDate date, Long courierId, DeliveryStatus status);
+
     DeliveryDto getDeliveryById(Long id);
+
     DeliveryDto createDelivery(DeliveryRequest deliveryRequest);
+
     DeliveryDto updateDelivery(Long id, DeliveryRequest deliveryRequest);
+
     void deleteDelivery(Long id);
+
     GenerateDeliveriesResponse generateDeliveries(GenerateDeliveriesRequest generateRequest);
 }

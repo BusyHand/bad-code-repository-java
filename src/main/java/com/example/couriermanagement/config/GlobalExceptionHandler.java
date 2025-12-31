@@ -22,33 +22,33 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         ErrorResponse error = ErrorResponse.builder()
-            .error(ErrorInfo.builder()
-                .code("BAD_REQUEST")
-                .message(ex.getMessage() != null ? ex.getMessage() : "Bad request")
-                .build())
-            .build();
+                .error(ErrorInfo.builder()
+                        .code("BAD_REQUEST")
+                        .message(ex.getMessage() != null ? ex.getMessage() : "Bad request")
+                        .build())
+                .build();
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex) {
         ErrorResponse error = ErrorResponse.builder()
-            .error(ErrorInfo.builder()
-                .code("INTERNAL_ERROR")
-                .message(ex.getMessage() != null ? ex.getMessage() : "Internal error")
-                .build())
-            .build();
+                .error(ErrorInfo.builder()
+                        .code("INTERNAL_ERROR")
+                        .message(ex.getMessage() != null ? ex.getMessage() : "Internal error")
+                        .build())
+                .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
         ErrorResponse error = ErrorResponse.builder()
-            .error(ErrorInfo.builder()
-                .code("FORBIDDEN")
-                .message("Access denied")
-                .build())
-            .build();
+                .error(ErrorInfo.builder()
+                        .code("FORBIDDEN")
+                        .message("Access denied")
+                        .build())
+                .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
@@ -57,21 +57,21 @@ public class GlobalExceptionHandler {
         Map<String, String> details = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = error instanceof FieldError
-                ? ((FieldError) error).getField()
-                : error.getObjectName();
+                    ? ((FieldError) error).getField()
+                    : error.getObjectName();
             String message = error.getDefaultMessage() != null
-                ? error.getDefaultMessage()
-                : "Validation error";
+                    ? error.getDefaultMessage()
+                    : "Validation error";
             details.put(fieldName, message);
         });
 
         ValidationErrorResponse error = ValidationErrorResponse.builder()
-            .error(ValidationErrorInfo.builder()
-                .code("VALIDATION_FAILED")
-                .message("Validation failed")
-                .details(details)
-                .build())
-            .build();
+                .error(ValidationErrorInfo.builder()
+                        .code("VALIDATION_FAILED")
+                        .message("Validation failed")
+                        .details(details)
+                        .build())
+                .build();
         return ResponseEntity.badRequest().body(error);
     }
 
@@ -80,32 +80,32 @@ public class GlobalExceptionHandler {
         Map<String, String> details = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = error instanceof FieldError
-                ? ((FieldError) error).getField()
-                : error.getObjectName();
+                    ? ((FieldError) error).getField()
+                    : error.getObjectName();
             String message = error.getDefaultMessage() != null
-                ? error.getDefaultMessage()
-                : "Validation error";
+                    ? error.getDefaultMessage()
+                    : "Validation error";
             details.put(fieldName, message);
         });
 
         ValidationErrorResponse error = ValidationErrorResponse.builder()
-            .error(ValidationErrorInfo.builder()
-                .code("VALIDATION_FAILED")
-                .message("Validation failed")
-                .details(details)
-                .build())
-            .build();
+                .error(ValidationErrorInfo.builder()
+                        .code("VALIDATION_FAILED")
+                        .message("Validation failed")
+                        .details(details)
+                        .build())
+                .build();
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         ErrorResponse error = ErrorResponse.builder()
-            .error(ErrorInfo.builder()
-                .code("INTERNAL_ERROR")
-                .message("Internal server error")
-                .build())
-            .build();
+                .error(ErrorInfo.builder()
+                        .code("INTERNAL_ERROR")
+                        .message("Internal server error")
+                        .build())
+                .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }

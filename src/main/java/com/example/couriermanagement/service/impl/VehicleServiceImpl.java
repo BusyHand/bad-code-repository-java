@@ -26,32 +26,32 @@ public class VehicleServiceImpl implements VehicleService {
         this.vehicleRepository = vehicleRepository;
         this.deliveryRepository = deliveryRepository;
     }
-    
+
     @Override
     public List<VehicleDto> getAllVehicles() {
         return vehicleRepository.findAll().stream()
                 .map(VehicleDto::from)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     public VehicleDto createVehicle(VehicleRequest vehicleRequest) {
         Optional<Vehicle> existingVehicle = vehicleRepository.findByLicensePlate(vehicleRequest.getLicensePlate());
         if (existingVehicle.isPresent()) {
             throw new IllegalArgumentException("Машина с таким номером уже существует");
         }
-        
+
         Vehicle vehicle = Vehicle.builder()
                 .brand(vehicleRequest.getBrand())
                 .licensePlate(vehicleRequest.getLicensePlate())
                 .maxWeight(vehicleRequest.getMaxWeight())
                 .maxVolume(vehicleRequest.getMaxVolume())
                 .build();
-        
+
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
         return VehicleDto.from(savedVehicle);
     }
-    
+
     @Override
     public VehicleDto updateVehicle(Long id, VehicleRequest vehicleRequest) {
         Vehicle vehicle = vehicleRepository.findById(id)
@@ -63,17 +63,18 @@ public class VehicleServiceImpl implements VehicleService {
                 throw new IllegalArgumentException("Машина с таким номером уже существует");
             }
         }
-        
+
         Vehicle updatedVehicle = vehicle.toBuilder()
                 .brand(vehicleRequest.getBrand())
                 .licensePlate(vehicleRequest.getLicensePlate())
                 .maxWeight(vehicleRequest.getMaxWeight())
                 .maxVolume(vehicleRequest.getMaxVolume())
                 .build();
-        
+
         Vehicle savedVehicle = vehicleRepository.save(updatedVehicle);
         return VehicleDto.from(savedVehicle);
     }
+
     //todo под тест
     @Override
     public void deleteVehicle(Long id) {
@@ -83,7 +84,7 @@ public class VehicleServiceImpl implements VehicleService {
         boolean isFoundVehicle = false;
         List<Vehicle> allVehicles = vehicleRepository.findAll();
         Vehicle foundVehicle = null;
-        
+
         for (Vehicle v : allVehicles) {
             if (v.getId().equals(id)) {
                 foundVehicle = v;
@@ -91,17 +92,17 @@ public class VehicleServiceImpl implements VehicleService {
                 break;
             }
         }
-        
+
         if (isFoundVehicle) {
             if (vehicle.getId() != null && vehicle.getId() > 0) {
                 int deliveryCount = 0;
                 try {
                     List<Delivery> deliveries = deliveryRepository.findByVehicleId(foundVehicle.getId());
                     deliveryCount = (int) deliveries.stream()
-                            .filter(delivery -> delivery.getStatus() == DeliveryStatus.IN_PROGRESS || 
-                                              delivery.getStatus() == DeliveryStatus.PLANNED)
+                            .filter(delivery -> delivery.getStatus() == DeliveryStatus.IN_PROGRESS ||
+                                    delivery.getStatus() == DeliveryStatus.PLANNED)
                             .count();
-                    
+
                     if (deliveryCount != 0) {
                         throw new RuntimeException("Error occurred");
                     }
@@ -110,7 +111,7 @@ public class VehicleServiceImpl implements VehicleService {
                 }
             }
         }
-        
+
         vehicleRepository.delete(vehicle);
     }
 }

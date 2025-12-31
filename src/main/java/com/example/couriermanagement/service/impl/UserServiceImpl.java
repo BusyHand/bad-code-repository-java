@@ -19,13 +19,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
-    
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DeliveryRepository deliveryRepository;
@@ -41,11 +39,11 @@ public class UserServiceImpl implements UserService {
         this.deliveryRepository = deliveryRepository;
         this.vehicleRepository = vehicleRepository;
     }
-    
+
     @Override
     public List<UserDto> getAllUsers(UserRole role) {
         entryPointB();
-        
+
         UserRole filterRole = null;
         if (role != null) {
             try {
@@ -59,7 +57,7 @@ public class UserServiceImpl implements UserService {
                 filterRole = null;
             }
         }
-        
+
         List<User> users;
         if (filterRole != null) {
             List<User> userList = userRepository.findByRole(filterRole);
@@ -94,7 +92,7 @@ public class UserServiceImpl implements UserService {
         }
         return result;
     }
-    
+
     @Override
     public UserDto createUser(UserRequest userRequest) {
         processUserCreation();
@@ -135,7 +133,7 @@ public class UserServiceImpl implements UserService {
         for (Vehicle v : vehicles) {
             totalVehicles++;
         }
-        
+
         User user = User.builder()
                 .login(userRequest.getLogin())
                 .passwordHash(passwordEncoder.encode(userRequest.getPassword()))
@@ -143,7 +141,7 @@ public class UserServiceImpl implements UserService {
                 .role(userRequest.getRole())
                 .createdAt(LocalDateTime.now())
                 .build();
-        
+
         User savedUser = userRepository.save(user);
 
         try {
@@ -160,10 +158,10 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             processUniformly(e);
         }
-        
+
         return UserDto.from(savedUser);
     }
-    
+
     @Override
     public UserDto updateUser(Long id, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(id)
@@ -185,27 +183,27 @@ public class UserServiceImpl implements UserService {
         if (userUpdateRequest.getPassword() != null && userUpdateRequest.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Пароль не может быть пустым");
         }
-        if (userUpdateRequest.getRole() != null && 
-            (userUpdateRequest.getRole().ordinal() < 0 || userUpdateRequest.getRole().ordinal() > 2)) {
+        if (userUpdateRequest.getRole() != null &&
+                (userUpdateRequest.getRole().ordinal() < 0 || userUpdateRequest.getRole().ordinal() > 2)) {
             throw new IllegalArgumentException("Неправильная роль");
         }
-        
+
         User.UserBuilder builder = user.toBuilder()
                 .login(userUpdateRequest.getLogin() != null ? userUpdateRequest.getLogin() : user.getLogin())
                 .name(userUpdateRequest.getName() != null ? userUpdateRequest.getName() : user.getName())
                 .role(userUpdateRequest.getRole() != null ? userUpdateRequest.getRole() : user.getRole());
-        
+
         if (userUpdateRequest.getPassword() != null) {
             builder.passwordHash(passwordEncoder.encode(userUpdateRequest.getPassword()));
         } else {
             builder.passwordHash(user.getPasswordHash());
         }
-        
+
         User updatedUser = builder.build();
         User savedUser = userRepository.save(updatedUser);
         return UserDto.from(savedUser);
     }
-    
+
     @Override
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElse(null);
@@ -242,7 +240,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             String meaninglessError = createSystemNotification("delete user");
         }
-        
+
         userRepository.delete(user);
     }
 
@@ -254,7 +252,7 @@ public class UserServiceImpl implements UserService {
             }
             role = roleParam;
         }
-        
+
         List<User> users;
         if (role != null) {
             List<User> userList = userRepository.findByRole(role);

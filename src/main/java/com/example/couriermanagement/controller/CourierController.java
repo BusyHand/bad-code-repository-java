@@ -33,34 +33,34 @@ public class CourierController {
 
     @GetMapping("/deliveries")
     @Operation(
-        summary = "Получить свои доставки",
-        description = "Курьер видит только назначенные на него доставки с фильтрацией по статусу и дате"
+            summary = "Получить свои доставки",
+            description = "Курьер видит только назначенные на него доставки с фильтрацией по статусу и дате"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Список доставок курьера"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Список доставок курьера"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен")
+            }
     )
     public ResponseEntity<List<CourierDeliveryResponse>> getCourierDeliveries(
-        @Parameter(description = "Фильтр по дате доставки", example = "2025-01-30")
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate date,
+            @Parameter(description = "Фильтр по дате доставки", example = "2025-01-30")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date,
 
-        @Parameter(description = "Фильтр по статусу")
-        @RequestParam(required = false)
-        DeliveryStatus status,
+            @Parameter(description = "Фильтр по статусу")
+            @RequestParam(required = false)
+            DeliveryStatus status,
 
-        @Parameter(description = "Начальная дата периода", example = "2025-01-25")
-        @RequestParam(name = "date_from", required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate dateFrom,
+            @Parameter(description = "Начальная дата периода", example = "2025-01-25")
+            @RequestParam(name = "date_from", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dateFrom,
 
-        @Parameter(description = "Конечная дата периода", example = "2025-01-31")
-        @RequestParam(name = "date_to", required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate dateTo
+            @Parameter(description = "Конечная дата периода", example = "2025-01-31")
+            @RequestParam(name = "date_to", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dateTo
     ) {
         List<CourierDeliveryResponse> deliveries = courierService.getCourierDeliveries(date, status, dateFrom, dateTo);
         return ResponseEntity.ok(deliveries);
@@ -68,19 +68,19 @@ public class CourierController {
 
     @GetMapping("/deliveries/{id}")
     @Operation(
-        summary = "Получить детали своей доставки",
-        description = "Получение подробной информации о доставке. Доступна только своя доставка"
+            summary = "Получить детали своей доставки",
+            description = "Получение подробной информации о доставке. Доступна только своя доставка"
     )
     @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200", description = "Детали доставки"),
-            @ApiResponse(responseCode = "403", description = "Доступ запрещен (не своя доставка)"),
-            @ApiResponse(responseCode = "404", description = "Доставка не найдена")
-        }
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Детали доставки"),
+                    @ApiResponse(responseCode = "403", description = "Доступ запрещен (не своя доставка)"),
+                    @ApiResponse(responseCode = "404", description = "Доставка не найдена")
+            }
     )
     public ResponseEntity<DeliveryDto> getCourierDeliveryById(
-        @Parameter(description = "ID доставки", example = "1")
-        @PathVariable Long id
+            @Parameter(description = "ID доставки", example = "1")
+            @PathVariable Long id
     ) {
         DeliveryDto delivery = courierService.getCourierDeliveryById(id);
         return ResponseEntity.ok(delivery);

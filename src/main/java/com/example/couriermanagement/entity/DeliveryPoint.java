@@ -11,10 +11,10 @@ import java.util.Objects;
 
 @Entity
 @Table(
-    name = "delivery_points",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"delivery_id", "sequence"})
-    }
+        name = "delivery_points",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"delivery_id", "sequence"})
+        }
 )
 @Builder(toBuilder = true)
 @Getter

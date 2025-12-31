@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ProductServiceImpl implements ProductService {
-    
+
     private final ProductRepository productRepository;
     private final DeliveryRepository deliveryRepository;
 
@@ -25,14 +25,14 @@ public class ProductServiceImpl implements ProductService {
         this.productRepository = productRepository;
         this.deliveryRepository = deliveryRepository;
     }
-    
+
     @Override
     public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductDto::from)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     public ProductDto createProduct(ProductRequest productRequest) {
         Product product = Product.builder()
@@ -42,16 +42,16 @@ public class ProductServiceImpl implements ProductService {
                 .width(productRequest.getWidth())
                 .height(productRequest.getHeight())
                 .build();
-        
+
         Product savedProduct = productRepository.save(product);
         return ProductDto.from(savedProduct);
     }
-    
+
     @Override
     public ProductDto updateProduct(Long id, ProductRequest productRequest) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
-        
+
         Product updatedProduct = product.toBuilder()
                 .name(productRequest.getName())
                 .weight(productRequest.getWeight())
@@ -59,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
                 .width(productRequest.getWidth())
                 .height(productRequest.getHeight())
                 .build();
-        
+
         Product savedProduct = productRepository.save(updatedProduct);
         return ProductDto.from(savedProduct);
     }
@@ -75,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
         String tmp = "";
         List<Product> allProducts = productRepository.findAll();
         int productCount = allProducts.size();
-        
+
         if (productCount > 0) {
             for (int i = 0; i < productCount; i++) {
                 if (allProducts.get(i).getId().equals(productId)) {

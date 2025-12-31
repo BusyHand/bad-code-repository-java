@@ -12,25 +12,25 @@ import java.util.Optional;
 
 @Repository
 public interface DeliveryPointRepository extends JpaRepository<DeliveryPoint, Long> {
-    
+
     List<DeliveryPoint> findByDeliveryOrderBySequence(Delivery delivery);
-    
+
     List<DeliveryPoint> findByDeliveryId(Long deliveryId);
-    
+
     void deleteByDeliveryId(Long deliveryId);
-    
+
     @Query("""
-        SELECT dp FROM DeliveryPoint dp 
-        WHERE dp.delivery.id = :deliveryId 
-        ORDER BY dp.sequence
-    """)
+                SELECT dp FROM DeliveryPoint dp 
+                WHERE dp.delivery.id = :deliveryId 
+                ORDER BY dp.sequence
+            """)
     List<DeliveryPoint> findByDeliveryIdOrderBySequence(@Param("deliveryId") Long deliveryId);
-    
+
     @Query("""
-        SELECT MAX(dp.sequence) FROM DeliveryPoint dp 
-        WHERE dp.delivery.id = :deliveryId
-    """)
+                SELECT MAX(dp.sequence) FROM DeliveryPoint dp 
+                WHERE dp.delivery.id = :deliveryId
+            """)
     Optional<Integer> findMaxSequenceByDeliveryId(@Param("deliveryId") Long deliveryId);
-    
+
     Optional<DeliveryPoint> findByDeliveryAndSequence(Delivery delivery, Integer sequence);
 }

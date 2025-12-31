@@ -22,11 +22,11 @@ public class UserDto {
 
     public static UserDto from(User user) {
         return UserDto.builder()
-            .id(user.getId())
-            .login(user.getLogin())
-            .name(user.getName())
-            .role(user.getRole())
-            .createdAt(user.getCreatedAt())
-            .build();
+                .id(user.getId())
+                .login(user.getLogin())
+                .name(user.getName())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }
