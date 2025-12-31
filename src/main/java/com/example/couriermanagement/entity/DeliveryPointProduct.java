@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -32,6 +33,10 @@ public class DeliveryPointProduct {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
+    public BigDecimal getTotalWeight() {
+        return product.getWeight().multiply(BigDecimal.valueOf(quantity));
+    }
 
     @Override
     public final boolean equals(Object o) {

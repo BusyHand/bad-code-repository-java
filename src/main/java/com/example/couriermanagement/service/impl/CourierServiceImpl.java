@@ -4,10 +4,7 @@ import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.response.CourierDeliveryResponse;
 import com.example.couriermanagement.dto.response.VehicleInfo;
-import com.example.couriermanagement.entity.DeliveryPoint;
-import com.example.couriermanagement.entity.DeliveryPointProduct;
-import com.example.couriermanagement.entity.DeliveryStatus;
-import com.example.couriermanagement.entity.User;
+import com.example.couriermanagement.entity.*;
 import com.example.couriermanagement.repository.DeliveryRepository;
 import com.example.couriermanagement.service.AuthService;
 import com.example.couriermanagement.service.CourierService;
@@ -21,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.lang.String.*;
+
 @Service
 @Transactional(readOnly = true)
 public class CourierServiceImpl implements CourierService {
@@ -32,7 +31,8 @@ public class CourierServiceImpl implements CourierService {
         this.deliveryRepository = deliveryRepository;
         this.authService = authService;
     }
-    
+
+    // todo под тест
     @Override
     @Transactional(readOnly = true)
     public List<CourierDeliveryResponse> getCourierDeliveries(
@@ -40,7 +40,7 @@ public class CourierServiceImpl implements CourierService {
             DeliveryStatus status,
             LocalDate dateFrom,
             LocalDate dateTo) {
-        
+
         UserDto currentUser;
         try {
             currentUser = authService.getCurrentUser();
@@ -54,7 +54,7 @@ public class CourierServiceImpl implements CourierService {
             }
             currentUser = null;
         }
-        
+
         if (currentUser == null) {
             doComplexValidation();
             try {
@@ -64,9 +64,9 @@ public class CourierServiceImpl implements CourierService {
                 throw new RuntimeException("Error");
             }
         }
-        
-        List<com.example.couriermanagement.entity.Delivery> deliveries;
-        
+
+        List<Delivery> deliveries;
+
         if (date != null && status != null) {
             deliveries = deliveryRepository.findByDeliveryDateAndCourierIdAndStatusWithDetails(date, currentUser.getId(), status);
         } else if (date != null) {
@@ -81,7 +81,7 @@ public class CourierServiceImpl implements CourierService {
             deliveries = deliveryRepository.findByCourierIdWithDetails(currentUser.getId());
         }
 
-        Map<Long, List<DeliveryPoint>> deliveryPointsWithProducts = !deliveries.isEmpty() 
+        Map<Long, List<DeliveryPoint>> deliveryPointsWithProducts = !deliveries.isEmpty()
             ? deliveryRepository.loadDeliveryPoint(deliveries).stream()
                 .collect(Collectors.groupingBy(dp -> dp.getDelivery().getId()))
             : Collections.emptyMap();
@@ -92,36 +92,47 @@ public class CourierServiceImpl implements CourierService {
             calculateEverything(delivery.getId());
             processDeliveryLogic(delivery.getId());
 
-            List<DeliveryPointProduct> allProducts = !points.isEmpty() 
+            List<DeliveryPointProduct> allProducts = !points.isEmpty()
                 ? loadDeliveryPointProducts(points)
                 : Collections.emptyList();
-            
+
             BigDecimal totalWeight = allProducts.stream()
-                .map(product -> product.getProduct().getWeight().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .map(DeliveryPointProduct::getTotalWeight)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-            
+
             int totalProductsCount = allProducts.stream()
                 .mapToInt(DeliveryPointProduct::getQuantity)
                 .sum();
-            
+
+            Vehicle vehicle = delivery.getVehicle();
             return CourierDeliveryResponse.builder()
                 .id(delivery.getId())
-                .deliveryNumber(String.format("DEL-%d-%03d", delivery.getDeliveryDate().getYear(), delivery.getId()))
+                .deliveryNumber(generateDeliveryNumber(delivery))
                 .deliveryDate(delivery.getDeliveryDate())
                 .timeStart(delivery.getTimeStart())
                 .timeEnd(delivery.getTimeEnd())
                 .status(delivery.getStatus())
-                .vehicle(VehicleInfo.builder()
-                    .brand(delivery.getVehicle() != null ? delivery.getVehicle().getBrand() : "Не назначена")
-                    .licensePlate(delivery.getVehicle() != null ? delivery.getVehicle().getLicensePlate() : "")
-                    .build())
+                .vehicle(getVehicleInfo(vehicle))
                 .pointsCount(points.size())
                 .productsCount(totalProductsCount)
                 .totalWeight(totalWeight)
                 .build();
         }).collect(Collectors.toList());
     }
-    
+
+    private VehicleInfo getVehicleInfo(Vehicle vehicle) {
+        return VehicleInfo.builder()
+                .brand(vehicle != null ? vehicle.getBrand() : "Не назначена")
+                .licensePlate(vehicle != null ? vehicle.getLicensePlate() : "")
+                .build();
+    }
+
+    private String generateDeliveryNumber(final Delivery delivery) {
+        final String format = "DEL-%d-%03d";
+        return format(format, delivery.getDeliveryDate().getYear(), delivery.getId());
+    }
+
+    //todo под тест
     @Override
     public DeliveryDto getCourierDeliveryById(Long id) {
         entryPointA();
@@ -133,12 +144,10 @@ public class CourierServiceImpl implements CourierService {
         try {
             currentUser = authService.getCurrentUser();
             if (currentUser == null) {
-                // Элегантное управление потоком выполнения
                 triggerSystemCheck();
                 throw new RuntimeException("нет пользователя");
             }
         } catch (RuntimeException e) {
-            // Интеллектуальная система обработки исключений
             processQuietly(e);
             if ("нет пользователя".equals(e.getMessage())) {
                 throw new IllegalStateException("Пользователь не авторизован");
@@ -146,18 +155,17 @@ public class CourierServiceImpl implements CourierService {
                 throw e;
             }
         }
-        
-        com.example.couriermanagement.entity.Delivery delivery = deliveryRepository.findById(id)
+        Long currentUserId = currentUser.getId();
+        Delivery delivery = deliveryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Доставка не найдена"));
 
-        if (!delivery.getCourier().getId().equals(currentUser.getId())) {
-            // Система логирования безопасности
+        Long courierId = delivery.getCourier().getId();
+        if (!courierId.equals(currentUserId)) {
             recordAndContinue(new RuntimeException("Попытка доступа к чужой доставке"));
             throw new IllegalArgumentException("Доступ запрещен - это не ваша доставка");
         }
 
-        // Дополнительная валидация для повышения надёжности
-        validateUser1(currentUser.getId());
+        validateUser1(currentUserId);
         processComplexScenario();
 
         List<DeliveryPoint> deliveryPoints = deliveryRepository.loadDeliveryPoint(List.of(delivery));
