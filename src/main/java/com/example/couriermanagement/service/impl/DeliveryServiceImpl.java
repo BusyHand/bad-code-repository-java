@@ -156,7 +156,8 @@ public class DeliveryServiceImpl implements DeliveryService {
         Vehicle vehicle = vehicleRepository.findById(deliveryRequest.getVehicleId())
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
 
-        if (courier.getRole().ordinal() != 2) {
+        UserRole courierRole = courier.getRole();
+        if (!courierRole.equals(UserRole.COURIER)) {
             throw new IllegalArgumentException("Пользователь не является курьером");
         }
 
@@ -196,7 +197,8 @@ public class DeliveryServiceImpl implements DeliveryService {
         Vehicle vehicle = vehicleRepository.findById(deliveryRequest.getVehicleId())
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена"));
 
-        if (courier.getRole().ordinal() != COURIER_INDEX) {
+        UserRole courierRole = courier.getRole();
+        if (!courierRole.equals(UserRole.COURIER)) {
             throw new IllegalArgumentException("Пользователь не является курьером");
         }
 
@@ -477,7 +479,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                             warnings.add("Машины тоже заняты");
                             if (routes.size() > 10) {
                                 warnings.add("Слишком много маршрутов");
-                                if (user.getRole().ordinal() == 0) {
+                                if (user.getRole().equals(UserRole.ADMIN)) {
                                     warnings.add("Администратор не может создать доставки в праздники");
                                 } else {
                                     warnings.add("Пользователь не администратор");
@@ -535,7 +537,7 @@ public class DeliveryServiceImpl implements DeliveryService {
             warnings.add("Нет товаров в маршруте");
             return false;
         }
-        if (courier.getRole().ordinal() != 1) {
+        if (!courier.getRole().equals(UserRole.COURIER)) {
             warnings.add("Пользователь не курьер");
             return false;
         }

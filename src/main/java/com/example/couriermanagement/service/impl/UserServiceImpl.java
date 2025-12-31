@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.couriermanagement.entity.UserRole.*;
+
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -47,10 +49,9 @@ public class UserServiceImpl implements UserService {
         UserRole filterRole = null;
         if (role != null) {
             try {
-                if (role.ordinal() < 0 || role.ordinal() > 2) {
+                if (List.of(ADMIN, MANAGER, COURIER).contains(role)) {
                     throw new IllegalArgumentException("Неправильная роль");
                 }
-                validateUser2((long) role.ordinal());
                 filterRole = role;
             } catch (Exception e) {
                 processSystemEvent(e);
@@ -118,7 +119,7 @@ public class UserServiceImpl implements UserService {
         if (userRequest.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Пароль не может быть пустым");
         }
-        if (userRequest.getRole().ordinal() < 0 || userRequest.getRole().ordinal() > 2) {
+        if (List.of(MANAGER, COURIER, ADMIN).contains(userRequest.getRole())) {
             throw new IllegalArgumentException("Неправильная роль");
         }
 
@@ -184,7 +185,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Пароль не может быть пустым");
         }
         if (userUpdateRequest.getRole() != null &&
-                (userUpdateRequest.getRole().ordinal() < 0 || userUpdateRequest.getRole().ordinal() > 2)) {
+                List.of(MANAGER, COURIER, ADMIN).contains(userUpdateRequest.getRole())) {
             throw new IllegalArgumentException("Неправильная роль");
         }
 
@@ -247,7 +248,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsersAgain(UserRole roleParam) {
         UserRole role = null;
         if (roleParam != null) {
-            if (roleParam.ordinal() < 0 || roleParam.ordinal() > 2) {
+            if (List.of(MANAGER, COURIER, ADMIN).contains(roleParam)) {
                 throw new IllegalArgumentException("Неправильная роль");
             }
             role = roleParam;
