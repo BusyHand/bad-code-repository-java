@@ -1,10 +1,14 @@
 package com.example.couriermanagement.service.impl;
 
+import com.example.couriermanagement.controller.filter.Filter;
 import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.response.CourierDeliveryResponse;
 import com.example.couriermanagement.dto.response.VehicleInfo;
-import com.example.couriermanagement.entity.*;
+import com.example.couriermanagement.entity.Delivery;
+import com.example.couriermanagement.entity.DeliveryPoint;
+import com.example.couriermanagement.entity.DeliveryPointProduct;
+import com.example.couriermanagement.entity.Vehicle;
 import com.example.couriermanagement.repository.DeliveryRepository;
 import com.example.couriermanagement.service.AuthService;
 import com.example.couriermanagement.service.CourierService;
@@ -12,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +38,7 @@ public class CourierServiceImpl implements CourierService {
     // todo под тест
     @Override
     @Transactional(readOnly = true)
-    public List<CourierDeliveryResponse> getCourierDeliveries(
-            LocalDate date,
-            DeliveryStatus status,
-            LocalDate dateFrom,
-            LocalDate dateTo) {
+    public List<CourierDeliveryResponse> getCourierDeliveries(Filter<Delivery> courierDeliveryFilter) {
 
         UserDto currentUser;
         try {
@@ -65,21 +64,7 @@ public class CourierServiceImpl implements CourierService {
             }
         }
 
-        List<Delivery> deliveries;
-
-        if (date != null && status != null) {
-            deliveries = deliveryRepository.findByDeliveryDateAndCourierIdAndStatusWithDetails(date, currentUser.getId(), status);
-        } else if (date != null) {
-            deliveries = deliveryRepository.findByDeliveryDateAndCourierIdWithDetails(date, currentUser.getId());
-        } else if (status != null && dateFrom != null && dateTo != null) {
-            deliveries = deliveryRepository.findByCourierIdAndStatusAndDeliveryDateBetweenWithDetails(currentUser.getId(), status, dateFrom, dateTo);
-        } else if (status != null) {
-            deliveries = deliveryRepository.findByCourierIdAndStatusWithDetails(currentUser.getId(), status);
-        } else if (dateFrom != null && dateTo != null) {
-            deliveries = deliveryRepository.findByCourierIdAndDeliveryDateBetweenWithDetails(currentUser.getId(), dateFrom, dateTo);
-        } else {
-            deliveries = deliveryRepository.findByCourierIdWithDetails(currentUser.getId());
-        }
+        List<Delivery> deliveries = deliveryRepository.findAll(courierDeliveryFilter.filter());
 
         Map<Long, List<DeliveryPoint>> deliveryPointsWithProducts = !deliveries.isEmpty()
                 ? deliveryRepository.loadDeliveryPoint(deliveries).stream()

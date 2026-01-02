@@ -1,10 +1,10 @@
 package com.example.couriermanagement.controller;
 
+import com.example.couriermanagement.controller.filter.impl.DeliveryFilter;
 import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.request.DeliveryRequest;
 import com.example.couriermanagement.dto.request.GenerateDeliveriesRequest;
 import com.example.couriermanagement.dto.response.GenerateDeliveriesResponse;
-import com.example.couriermanagement.entity.DeliveryStatus;
 import com.example.couriermanagement.service.DeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,13 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -69,21 +68,11 @@ public class DeliveryController {
                     @ApiResponse(responseCode = "403", description = "Доступ запрещен")
             }
     )
+    //todo под тест
     public ResponseEntity<List<DeliveryDto>> getAllDeliveries(
-            @Parameter(description = "Фильтр по дате", example = "2025-01-30")
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate date,
-
-            @Parameter(description = "Фильтр по ID курьера", example = "1")
-            @RequestParam(name = "courier_id", required = false)
-            Long courierId,
-
-            @Parameter(description = "Фильтр по статусу")
-            @RequestParam(required = false)
-            DeliveryStatus status
+            @ParameterObject @ModelAttribute DeliveryFilter deliveryFilter
     ) {
-        List<DeliveryDto> deliveries = deliveryService.getAllDeliveries(date, courierId, status);
+        List<DeliveryDto> deliveries = deliveryService.getAll(deliveryFilter);
         return ResponseEntity.ok(deliveries);
     }
 

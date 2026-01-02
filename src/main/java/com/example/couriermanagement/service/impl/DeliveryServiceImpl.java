@@ -1,5 +1,6 @@
 package com.example.couriermanagement.service.impl;
 
+import com.example.couriermanagement.controller.filter.Filter;
 import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.request.*;
@@ -11,6 +12,7 @@ import com.example.couriermanagement.service.AuthService;
 import com.example.couriermanagement.service.DeliveryService;
 import com.example.couriermanagement.service.OpenStreetMapService;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +28,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class DeliveryServiceImpl implements DeliveryService {
 
     public static final int MAX_DAYS_TO_UPDATE_DELIVERY = 3;
     public static final int MAX_DAYS_TO_DELETE_DELIVERY = 3;
-    public static final int COURIER_INDEX = 2;
     public static final int MINUTES_IN_HOUR = 60;
     private final DeliveryRepository deliveryRepository;
     private final DeliveryPointRepository deliveryPointRepository;
@@ -42,48 +44,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final OpenStreetMapService openStreetMapService;
     private final EntityManager entityManager;
 
-    public DeliveryServiceImpl(
-            DeliveryRepository deliveryRepository,
-            DeliveryPointRepository deliveryPointRepository,
-            DeliveryPointProductRepository deliveryPointProductRepository,
-            UserRepository userRepository,
-            VehicleRepository vehicleRepository,
-            ProductRepository productRepository,
-            AuthService authService,
-            OpenStreetMapService openStreetMapService,
-            EntityManager entityManager) {
-        this.deliveryRepository = deliveryRepository;
-        this.deliveryPointRepository = deliveryPointRepository;
-        this.deliveryPointProductRepository = deliveryPointProductRepository;
-        this.userRepository = userRepository;
-        this.vehicleRepository = vehicleRepository;
-        this.productRepository = productRepository;
-        this.authService = authService;
-        this.openStreetMapService = openStreetMapService;
-        this.entityManager = entityManager;
-    }
-
     @Override
-    public List<DeliveryDto> getAllDeliveries(LocalDate date, Long courierId, DeliveryStatus status) {
-        List<Delivery> deliveries;
+    public List<DeliveryDto> getAll(Filter<Delivery> deliveryFilter) {
 
-        if (date != null && courierId != null && status != null) {
-            deliveries = deliveryRepository.findByDeliveryDateAndCourierIdAndStatus(date, courierId, status);
-        } else if (date != null && courierId != null) {
-            deliveries = deliveryRepository.findByDeliveryDateAndCourierId(date, courierId);
-        } else if (date != null && status != null) {
-            deliveries = deliveryRepository.findByDeliveryDateAndStatus(date, status);
-        } else if (date != null) {
-            deliveries = deliveryRepository.findByDeliveryDate(date);
-        } else if (courierId != null && status != null) {
-            deliveries = deliveryRepository.findByCourierIdAndStatus(courierId, status);
-        } else if (courierId != null) {
-            deliveries = deliveryRepository.findByCourierId(courierId);
-        } else if (status != null) {
-            deliveries = deliveryRepository.findByStatus(status);
-        } else {
-            deliveries = deliveryRepository.findAll();
-        }
+        List<Delivery> deliveries = deliveryRepository.findAll(deliveryFilter.filter());
 
         Map<Long, List<DeliveryPoint>> deliveryPointsMap = deliveryRepository.loadDeliveryPoint(deliveries)
                 .stream()

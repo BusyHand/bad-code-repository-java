@@ -1,8 +1,8 @@
 package com.example.couriermanagement.controller;
 
+import com.example.couriermanagement.controller.filter.impl.CourierDeliveryFilter;
 import com.example.couriermanagement.dto.DeliveryDto;
 import com.example.couriermanagement.dto.response.CourierDeliveryResponse;
-import com.example.couriermanagement.entity.DeliveryStatus;
 import com.example.couriermanagement.service.CourierService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,12 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -42,27 +41,11 @@ public class CourierController {
                     @ApiResponse(responseCode = "403", description = "Доступ запрещен")
             }
     )
+    //todo под тест
     public ResponseEntity<List<CourierDeliveryResponse>> getCourierDeliveries(
-            @Parameter(description = "Фильтр по дате доставки", example = "2025-01-30")
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate date,
-
-            @Parameter(description = "Фильтр по статусу")
-            @RequestParam(required = false)
-            DeliveryStatus status,
-
-            @Parameter(description = "Начальная дата периода", example = "2025-01-25")
-            @RequestParam(name = "date_from", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate dateFrom,
-
-            @Parameter(description = "Конечная дата периода", example = "2025-01-31")
-            @RequestParam(name = "date_to", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate dateTo
+            @ParameterObject @ModelAttribute CourierDeliveryFilter courierDeliveryFilter
     ) {
-        List<CourierDeliveryResponse> deliveries = courierService.getCourierDeliveries(date, status, dateFrom, dateTo);
+        List<CourierDeliveryResponse> deliveries = courierService.getCourierDeliveries(courierDeliveryFilter);
         return ResponseEntity.ok(deliveries);
     }
 
