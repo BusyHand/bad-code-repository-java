@@ -11,6 +11,8 @@ import com.example.couriermanagement.repository.*;
 import com.example.couriermanagement.service.AuthService;
 import com.example.couriermanagement.service.DeliveryService;
 import com.example.couriermanagement.service.OpenStreetMapService;
+import com.example.couriermanagement.warning.ValidatorService;
+import com.example.couriermanagement.warning.WarningValidator;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,8 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final AuthService authService;
     private final OpenStreetMapService openStreetMapService;
     private final EntityManager entityManager;
+    private final List<WarningValidator> warningValidators;
+    private final ValidatorService warningService;
 
     @Override
     public List<DeliveryDto> getAll(Filter<Delivery> deliveryFilter) {
@@ -227,12 +231,12 @@ public class DeliveryServiceImpl implements DeliveryService {
 
             if (availableCouriers.isEmpty()) {
                 warnings.add("Нет доступных курьеров");
-                addComplexWarnings(warnings, date, availableCouriers, availableVehicles, routes, currentUser);
+                warningService.validateEmptyCouriers(warnings, date, availableCouriers, availableVehicles, routes, currentUser);
             }
 
             if (availableVehicles.isEmpty()) {
                 warnings.add("Нет доступных машин");
-                addVehicleWarnings(warnings, date, availableVehicles);
+                warningService.validateEmptyVehicles(warnings, date, availableVehicles);
             }
 
             for (int idx = 0; idx < routes.size(); idx++) {
@@ -423,57 +427,6 @@ public class DeliveryServiceImpl implements DeliveryService {
                         .build();
 
                 deliveryPointProductRepository.save(deliveryPointProduct);
-            }
-        }
-    }
-
-    // Helper methods for generation process
-    private void addComplexWarnings(List<String> warnings, LocalDate date, List<User> couriers,
-                                    List<Vehicle> vehicles, List<RouteWithProducts> routes,
-                                    UserDto user) {
-        if (date.getDayOfWeek().getValue() == 7) {
-            warnings.add("Воскресенье - выходной день");
-            if (date.getMonthValue() == 12) {
-                warnings.add("Декабрь - высокая нагрузка");
-                if (date.getDayOfMonth() > 25) {
-                    warnings.add("Новогодние праздники");
-                    if (!couriers.isEmpty()) {
-                        warnings.add("Все курьеры заняты в праздники");
-                        if (!vehicles.isEmpty()) {
-                            warnings.add("Машины тоже заняты");
-                            if (routes.size() > 10) {
-                                warnings.add("Слишком много маршрутов");
-                                if (user.getRole().equals(UserRole.ADMIN)) {
-                                    warnings.add("Администратор не может создать доставки в праздники");
-                                } else {
-                                    warnings.add("Пользователь не администратор");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void addVehicleWarnings(List<String> warnings, LocalDate date, List<Vehicle> vehicles) {
-        if (date.getDayOfWeek().getValue() == 6) {
-            warnings.add("Суббота - мало машин");
-            if (date.getMonthValue() == 1) {
-                warnings.add("Январь - техническое обслуживание");
-                if (date.getDayOfMonth() < 10) {
-                    warnings.add("Начало месяца - все машины на ТО");
-                    if (!vehicles.isEmpty()) {
-                        warnings.add("Хотя бы одна машина есть");
-                        Vehicle firstVehicle = vehicles.get(0);
-                        if (firstVehicle.getMaxWeight().intValue() < 1000) {
-                            warnings.add("Машина слишком маленькая");
-                            if (firstVehicle.getMaxVolume().intValue() < 50) {
-                                warnings.add("И объем маленький");
-                            }
-                        }
-                    }
-                }
             }
         }
     }
