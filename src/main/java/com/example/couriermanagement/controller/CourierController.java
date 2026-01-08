@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,7 @@ public class CourierController {
     }
 
     @GetMapping("/deliveries/{id}")
+    @PreAuthorize("hasRole('COURIER') and @cse.canAccessDelivery(#id)")
     @Operation(
             summary = "Получить детали своей доставки",
             description = "Получение подробной информации о доставке. Доступна только своя доставка"
@@ -63,6 +65,7 @@ public class CourierController {
     )
     public ResponseEntity<DeliveryDto> getCourierDeliveryById(
             @Parameter(description = "ID доставки", example = "1")
+            @Param("id")
             @PathVariable Long id
     ) {
         DeliveryDto delivery = courierService.getCourierDeliveryById(id);

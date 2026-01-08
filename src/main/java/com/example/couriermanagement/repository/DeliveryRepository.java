@@ -1,6 +1,9 @@
 package com.example.couriermanagement.repository;
 
-import com.example.couriermanagement.entity.*;
+import com.example.couriermanagement.entity.Delivery;
+import com.example.couriermanagement.entity.DeliveryPoint;
+import com.example.couriermanagement.entity.DeliveryPointProduct;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DeliveryRepository extends JpaRepository<Delivery, Long>, JpaSpecificationExecutor<Delivery> {
@@ -60,4 +64,20 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long>, JpaSp
                 WHERE dpp.product.id = :productId
             """)
     List<Delivery> findByProductId(@Param("productId") Long productId);
+
+    @EntityGraph(attributePaths = {
+            "deliveryPoints"
+    })
+    Optional<Delivery> findWithPointsById(Long id);
+
+    @Query("""
+                SELECT dp FROM DeliveryPoint dp
+                LEFT JOIN FETCH dp.deliveryPointProducts dpp
+                LEFT JOIN FETCH dpp.product
+                WHERE dp.delivery.id = :deliveryId
+                ORDER BY dp.sequence
+            """)
+    List<DeliveryPoint> findPointsWithProducts(@Param("deliveryId") Long deliveryId);
+
+
 }

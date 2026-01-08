@@ -2,7 +2,6 @@ package com.example.couriermanagement.service.impl;
 
 import com.example.couriermanagement.controller.filter.Filter;
 import com.example.couriermanagement.dto.DeliveryDto;
-import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.request.DeliveryRequest;
 import com.example.couriermanagement.dto.request.GenerateDeliveriesRequest;
 import com.example.couriermanagement.dto.request.RouteWithProducts;
@@ -102,13 +101,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     public DeliveryDto createDelivery(DeliveryRequest deliveryRequest) {
         deliveryValidationService.validateDeliveryRequest(deliveryRequest);
 
-        UserDto currentUser = authService.getCurrentUser();
-        if (currentUser == null) {
-            throw new IllegalStateException("Пользователь не авторизован");
-        }
-
-        User createdBy = userRepository.findByLogin(currentUser.getLogin())
-                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+        User currentUser = authService.getCurrentUser();
 
         User courier = userRepository.findById(deliveryRequest.getCourierId())
                 .orElseThrow(() -> new IllegalArgumentException("Курьер не найден"));
@@ -124,7 +117,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         Delivery delivery = Delivery.builder()
                 .courier(courier)
                 .vehicle(vehicle)
-                .createdBy(createdBy)
+                .createdBy(currentUser)
                 .deliveryDate(deliveryRequest.getDeliveryDate())
                 .timeStart(deliveryRequest.getTimeStart())
                 .timeEnd(deliveryRequest.getTimeEnd())
@@ -200,13 +193,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     public GenerateDeliveriesResponse generateDeliveries(GenerateDeliveriesRequest generateRequest) {
-        UserDto currentUser = authService.getCurrentUser();
-        if (currentUser == null) {
-            throw new IllegalStateException("Пользователь не авторизован");
-        }
-
-        User createdBy = userRepository.findByLogin(currentUser.getLogin())
-                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
+        User currentUser = authService.getCurrentUser();
 
         Map<LocalDate, GenerationResultByDate> resultsByDate = new HashMap<>();
         int totalGenerated = 0;
@@ -245,7 +232,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                             try {
                                 deliveryValidationService.validateVehicleCapacity(tempDeliveryRequest);
 
-                                Delivery delivery = deliveryFactoryService.createDeliveryFromRoute(courier, vehicle, createdBy, date, route, idx);
+                                Delivery delivery = deliveryFactoryService.createDeliveryFromRoute(courier, vehicle, currentUser, date, route, idx);
                                 Delivery savedDelivery = deliveryRepository.save(delivery);
 
                                 deliveryFactoryService.createDeliveryPointsFromRoute(savedDelivery, route, warnings);

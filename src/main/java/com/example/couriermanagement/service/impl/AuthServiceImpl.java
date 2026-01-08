@@ -45,18 +45,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDto getCurrentUser() {
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
-            return null;
+            throw new IllegalStateException("Пользователь не авторизован");
         }
-
-        String username = authentication.getName();
-        Optional<User> userOptional = userRepository.findByLogin(username);
-        if (userOptional.isEmpty()) {
-            return null;
-        }
-
-        return UserDto.from(userOptional.get());
+        return userRepository.findByLogin(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Пользователь не найден"));
     }
 }

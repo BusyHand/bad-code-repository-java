@@ -1,9 +1,9 @@
 package com.example.couriermanagement.controller;
 
+import com.example.couriermanagement.controller.filter.impl.UserFilter;
 import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.request.UserRequest;
 import com.example.couriermanagement.dto.request.UserUpdateRequest;
-import com.example.couriermanagement.entity.UserRole;
 import com.example.couriermanagement.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,11 +45,11 @@ public class UserController {
                     @ApiResponse(responseCode = "403", description = "Доступ запрещен")
             }
     )
+    //todo под тест
     public ResponseEntity<List<UserDto>> getAllUsers(
-            @Parameter(description = "Фильтр по роли пользователя")
-            @RequestParam(required = false) UserRole role
+            @ParameterObject @ModelAttribute UserFilter userFilter
     ) {
-        List<UserDto> users = userService.getAllUsers(role);
+        List<UserDto> users = userService.getAllUsers(userFilter);
         return ResponseEntity.ok(users);
     }
 
@@ -91,6 +93,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') and @use.canDeleteUser(#id)")
     @Operation(
             summary = "Удалить пользователя",
             description = "Удаление пользователя из системы. Доступно только для админа"
@@ -104,6 +107,7 @@ public class UserController {
     )
     public ResponseEntity<Void> deleteUser(
             @Parameter(description = "ID пользователя", example = "1")
+            @Param("id")
             @PathVariable Long id
     ) {
         userService.deleteUser(id);

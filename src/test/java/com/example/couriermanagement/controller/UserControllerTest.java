@@ -128,6 +128,9 @@ public class UserControllerTest extends BaseIntegrationTest {
     public void updateUserAsManagerShouldReturn403() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
                 .name("Обновленное Имя")
+                .password("Обновленное Имя")
+                .login("Обновленное Имя")
+                .role(UserRole.COURIER)
                 .build();
 
         expectForbidden(putJson("/users/" + courierUser.getId(), updateRequest, managerToken));
@@ -137,6 +140,9 @@ public class UserControllerTest extends BaseIntegrationTest {
     public void updateUserWithDuplicateLoginShouldReturn400() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
                 .login("admin") // Already exists
+                .name("Обновленное Имя")
+                .password("Обновленное Имя")
+                .role(UserRole.COURIER)
                 .build();
 
         expectBadRequest(putJson("/users/" + courierUser.getId(), updateRequest, adminToken));
@@ -155,12 +161,15 @@ public class UserControllerTest extends BaseIntegrationTest {
     public void updateUserPartialDataShouldSucceed() throws Exception {
         UserUpdateRequest updateRequest = UserUpdateRequest.builder()
                 .name("Только Новое Имя")
+                .login("Только Новое Имя")
+                .password("Только Новое Имя")
+                .role(UserRole.COURIER)
                 .build();
 
         expectSuccess(putJson("/users/" + courierUser.getId(), updateRequest, adminToken))
                 .andExpect(jsonPath("$.name").value("Только Новое Имя"))
-                .andExpect(jsonPath("$.login").value(courierUser.getLogin())) // Unchanged
-                .andExpect(jsonPath("$.role").value(courierUser.getRole().name())); // Unchanged
+                .andExpect(jsonPath("$.login").value("Только Новое Имя"))
+                .andExpect(jsonPath("$.role").value("COURIER"));
     }
 
     @Test

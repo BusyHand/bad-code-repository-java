@@ -1,14 +1,14 @@
 package com.example.couriermanagement.service;
 
+import com.example.couriermanagement.controller.filter.impl.UserFilter;
 import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.request.UserRequest;
 import com.example.couriermanagement.dto.request.UserUpdateRequest;
-import com.example.couriermanagement.entity.UserRole;
 
 import java.util.List;
 
 public interface UserService {
-    List<UserDto> getAllUsers(UserRole role);
+    List<UserDto> getAllUsers(UserFilter userFilter);
 
     UserDto createUser(UserRequest userRequest);
 

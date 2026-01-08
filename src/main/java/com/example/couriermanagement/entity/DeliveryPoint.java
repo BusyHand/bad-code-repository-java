@@ -2,6 +2,7 @@ package com.example.couriermanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;

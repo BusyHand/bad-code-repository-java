@@ -54,29 +54,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
-        Map<String, String> details = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = error instanceof FieldError
-                    ? ((FieldError) error).getField()
-                    : error.getObjectName();
-            String message = error.getDefaultMessage() != null
-                    ? error.getDefaultMessage()
-                    : "Validation error";
-            details.put(fieldName, message);
-        });
-
-        ValidationErrorResponse error = ValidationErrorResponse.builder()
-                .error(ValidationErrorInfo.builder()
-                        .code("VALIDATION_FAILED")
-                        .message("Validation failed")
-                        .details(details)
-                        .build())
-                .build();
-        return ResponseEntity.badRequest().body(error);
+        return getValidationErrorResponseResponseEntity(ex);
     }
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ValidationErrorResponse> handleBindException(BindException ex) {
+        return getValidationErrorResponseResponseEntity(ex);
+    }
+
+    private ResponseEntity<ValidationErrorResponse> getValidationErrorResponseResponseEntity(BindException ex) {
         Map<String, String> details = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = error instanceof FieldError

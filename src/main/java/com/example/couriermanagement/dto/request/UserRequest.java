@@ -4,10 +4,7 @@ import com.example.couriermanagement.entity.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
@@ -15,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Данные для создания пользователя")
 public class UserRequest {
+
     @NotBlank(message = "Логин обязателен")
     @Schema(description = "Логин пользователя", example = "courier1")
     private String login;

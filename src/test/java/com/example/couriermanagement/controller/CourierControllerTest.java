@@ -128,7 +128,7 @@ public class CourierControllerTest extends BaseIntegrationTest {
         );
         Delivery delivery = createDelivery(anotherCourier, createVehicle());
 
-        expectBadRequest(getWithAuth("/courier/deliveries/" + delivery.getId(), courierToken)); // Service throws IllegalArgumentException about access
+        expectForbidden(getWithAuth("/courier/deliveries/" + delivery.getId(), courierToken)); // Service throws IllegalArgumentException about access
     }
 
     @Test

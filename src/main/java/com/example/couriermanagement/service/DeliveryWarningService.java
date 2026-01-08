@@ -1,7 +1,6 @@
 package com.example.couriermanagement.service;
 
 
-import com.example.couriermanagement.dto.UserDto;
 import com.example.couriermanagement.dto.request.RouteWithProducts;
 import com.example.couriermanagement.entity.User;
 import com.example.couriermanagement.entity.UserRole;
@@ -17,7 +16,7 @@ public class DeliveryWarningService {
 
     public void addComplexWarnings(List<String> warnings, LocalDate date, List<User> couriers,
                                    List<Vehicle> vehicles, List<RouteWithProducts> routes,
-                                   UserDto user) {
+                                   User user) {
         if (date.getDayOfWeek().getValue() == 7) {
             warnings.add("Воскресенье - выходной день");
             if (date.getMonthValue() == 12) {
