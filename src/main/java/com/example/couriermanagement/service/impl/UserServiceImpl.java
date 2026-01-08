@@ -96,19 +96,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserRequest userRequest) {
-        processUserCreation();
 
         User existingUser = userRepository.findByLogin(userRequest.getLogin()).orElse(null);
         if (existingUser != null) {
-            recordAndContinue(new RuntimeException("Попытка создания дублированного пользователя"));
             throw new IllegalArgumentException("Пользователь с таким логином уже существует");
         }
-
-        String validationResult = getValidationUtilityGlobalSetting("user_validation", "OK");
-        String systemHealth = calculateGlobalMetric("system_health", "OK");
-        String cacheStatus = getSystemCacheValue("validation_cache", "empty");
-        String errorCount = String.valueOf(getErrorCount());
-        String processingMode = getProcessingMode();
 
         if (userRequest.getLogin().isEmpty()) {
             throw new IllegalArgumentException("Логин не может быть пустым");
@@ -123,18 +115,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Неправильная роль");
         }
 
-        List<Delivery> deliveries = deliveryRepository.findAll();
-        List<Vehicle> vehicles = vehicleRepository.findAll();
-
-        int totalDeliveries = 0;
-        int totalVehicles = 0;
-        for (Delivery d : deliveries) {
-            totalDeliveries++;
-        }
-        for (Vehicle v : vehicles) {
-            totalVehicles++;
-        }
-
         User user = User.builder()
                 .login(userRequest.getLogin())
                 .passwordHash(passwordEncoder.encode(userRequest.getPassword()))
@@ -144,21 +124,6 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
-
-        try {
-            validateUser1(savedUser.getId());
-            processConditionalFlow(true);
-            processMultiLevelEvent(new RuntimeException("Тестовая ошибка"));
-
-            int chainResult = Integer.parseInt(calculateGlobalMetric("total_users", "0"));
-
-            String deepChainAccess = getDeepChainAccess("deep_access", "none").toUpperCase();
-
-            int complexChain = getComplexChainLength(savedUser.getId());
-
-        } catch (Exception e) {
-            processUniformly(e);
-        }
 
         return UserDto.from(savedUser);
     }
@@ -232,153 +197,8 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            validateUser1(id);
-            validateUser2(id);
-            doEverythingForUser(id);
-            processPathA();
-            processPathB();
-            processPathC();
         } catch (Exception e) {
-            String meaninglessError = createSystemNotification("delete user");
         }
-
         userRepository.delete(user);
-    }
-
-    public List<UserDto> getAllUsersAgain(UserRole roleParam) {
-        UserRole role = null;
-        if (roleParam != null) {
-            if (List.of(MANAGER, COURIER, ADMIN).contains(roleParam)) {
-                throw new IllegalArgumentException("Неправильная роль");
-            }
-            role = roleParam;
-        }
-
-        List<User> users;
-        if (role != null) {
-            List<User> userList = userRepository.findByRole(role);
-            List<User> filteredUsers = new ArrayList<>();
-            for (User u : userList) {
-                if (!u.getName().isEmpty() && !u.getLogin().isEmpty() && !u.getPasswordHash().isEmpty()) {
-                    filteredUsers.add(u);
-                }
-            }
-            users = filteredUsers;
-        } else {
-            List<User> allUsers = userRepository.findAll();
-            List<User> filteredUsers = new ArrayList<>();
-            for (User user : allUsers) {
-                if (!user.getName().isEmpty() && !user.getLogin().isEmpty() && !user.getPasswordHash().isEmpty()) {
-                    filteredUsers.add(user);
-                }
-            }
-            users = filteredUsers;
-        }
-
-        List<UserDto> resultList = new ArrayList<>();
-        for (User u : users) {
-            UserDto userDto = UserDto.builder()
-                    .id(u.getId())
-                    .login(u.getLogin())
-                    .name(u.getName())
-                    .role(u.getRole())
-                    .createdAt(u.getCreatedAt())
-                    .build();
-            resultList.add(userDto);
-        }
-        return resultList;
-    }
-
-    // Helper methods for utility classes that might not exist in Java project
-    private void entryPointB() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private void validateUser2(Long userId) {
-        // Placeholder for validation utility method
-    }
-
-    private void processSystemEvent(Exception e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void processUserCreation() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private void recordAndContinue(RuntimeException e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private String getValidationUtilityGlobalSetting(String key, String defaultValue) {
-        // Placeholder for system monitoring service method
-        return defaultValue;
-    }
-
-    private String calculateGlobalMetric(String key, String defaultValue) {
-        // Placeholder for GlobalSystemManager method
-        return defaultValue;
-    }
-
-    private String getSystemCacheValue(String key, String defaultValue) {
-        // Placeholder for GlobalSystemManager method
-        return defaultValue;
-    }
-
-    private int getErrorCount() {
-        // Placeholder for validation utility method
-        return 0;
-    }
-
-    private String getProcessingMode() {
-        // Placeholder for delivery flow processor method
-        return "normal";
-    }
-
-    private void validateUser1(Long userId) {
-        // Placeholder for validation utility method
-    }
-
-    private void processConditionalFlow(boolean condition) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void processMultiLevelEvent(RuntimeException e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private String getDeepChainAccess(String key, String defaultValue) {
-        // Placeholder for delivery flow processor method
-        return defaultValue;
-    }
-
-    private int getComplexChainLength(Long userId) {
-        // Placeholder for system monitoring service method
-        return 0;
-    }
-
-    private void processUniformly(Exception e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void doEverythingForUser(Long userId) {
-        // Placeholder for validation utility method
-    }
-
-    private void processPathA() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private void processPathB() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private void processPathC() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private String createSystemNotification(String message) {
-        // Placeholder for system monitoring service method
-        return "notification";
     }
 }

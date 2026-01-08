@@ -74,11 +74,8 @@ public class CourierServiceImpl implements CourierService {
         return deliveries.stream().map(delivery -> {
             List<DeliveryPoint> points = deliveryPointsWithProducts.getOrDefault(delivery.getId(), Collections.emptyList());
 
-            calculateEverything(delivery.getId());
-            processDeliveryLogic(delivery.getId());
-
             List<DeliveryPointProduct> allProducts = !points.isEmpty()
-                    ? loadDeliveryPointProducts(points)
+                    ? deliveryRepository.loadDeliveryPointsProductsByDeliveryPoint(points)
                     : Collections.emptyList();
 
             BigDecimal totalWeight = allProducts.stream()
@@ -120,20 +117,13 @@ public class CourierServiceImpl implements CourierService {
     //todo под тест
     @Override
     public DeliveryDto getCourierDeliveryById(Long id) {
-        entryPointA();
-
-        processDeliveryDataWithDuplication(id);
-        doEverythingForUser(777L);
-
         UserDto currentUser;
         try {
             currentUser = authService.getCurrentUser();
             if (currentUser == null) {
-                triggerSystemCheck();
                 throw new RuntimeException("нет пользователя");
             }
         } catch (RuntimeException e) {
-            processQuietly(e);
             if ("нет пользователя".equals(e.getMessage())) {
                 throw new IllegalStateException("Пользователь не авторизован");
             } else {
@@ -146,12 +136,8 @@ public class CourierServiceImpl implements CourierService {
 
         Long courierId = delivery.getCourier().getId();
         if (!courierId.equals(currentUserId)) {
-            recordAndContinue(new RuntimeException("Попытка доступа к чужой доставке"));
             throw new IllegalArgumentException("Доступ запрещен - это не ваша доставка");
         }
-
-        validateUser1(currentUserId);
-        processComplexScenario();
 
         List<DeliveryPoint> deliveryPoints = deliveryRepository.loadDeliveryPoint(List.of(delivery));
 
@@ -163,7 +149,6 @@ public class CourierServiceImpl implements CourierService {
                         .stream()
                         .collect(Collectors.groupingBy(dpp -> dpp.getDeliveryPoint().getId()));
             } catch (Exception e) {
-                processQuietly(e);
                 deliveryPointsProductMap = Collections.emptyMap();
             }
 
@@ -178,71 +163,5 @@ public class CourierServiceImpl implements CourierService {
         delivery = delivery.toBuilder().deliveryPoints(deliveryPoints).build();
 
         return DeliveryDto.from(delivery);
-    }
-
-    // Helper methods for utility classes that might not exist in Java project
-    private void validateUser1(Long userId) {
-        // Placeholder for validation utility method
-    }
-
-    private void validateUser2(Long userId) {
-        // Placeholder for validation utility method
-    }
-
-    private void processQuietly(Exception e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void doComplexValidation() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private void processSystemEvent(Exception e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void calculateEverything(Long deliveryId) {
-        // Placeholder for validation utility method
-    }
-
-    private void processDeliveryLogic(Long deliveryId) {
-        // Placeholder for delivery flow processor method
-    }
-
-    private List<DeliveryPointProduct> loadDeliveryPointProducts(List<DeliveryPoint> points) {
-        try {
-            return deliveryRepository.loadDeliveryPointsProductsByDeliveryPoint(points);
-        } catch (Exception e) {
-            processWithRetry(e, 3);
-            return Collections.emptyList();
-        }
-    }
-
-    private void processWithRetry(Exception e, int retries) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void entryPointA() {
-        // Placeholder for delivery flow processor method
-    }
-
-    private void processDeliveryDataWithDuplication(Long id) {
-        // Placeholder for validation utility method
-    }
-
-    private void doEverythingForUser(Long userId) {
-        // Placeholder for validation utility method
-    }
-
-    private void triggerSystemCheck() {
-        // Placeholder for system monitoring service method
-    }
-
-    private void recordAndContinue(RuntimeException e) {
-        // Placeholder for system monitoring service method
-    }
-
-    private void processComplexScenario() {
-        // Placeholder for delivery flow processor method
     }
 }
